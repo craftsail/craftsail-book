@@ -32,7 +32,7 @@ CraftSail 是面向独立开发者和小团队的 AI / 开发者趋势数据门�
 
 | 章节 | 讲什么 |
 | --- | --- |
-| [用 CraftSail 讲 SEO 落地](seo/用CraftSail讲SEO落地.md) | 用 CraftSail 的真实 HTML、URL、robots、sitemap、llms.txt，讲搜索引擎和 AI 怎么发现这个站 |
+| [SEO 落地](seo/SEO落地.md) | 独立 URL、真实链接、`<head>`、robots、sitemap、llms.txt。文中 HTML 可在线上核对 |
 
 SEO 放第一篇，是因为出海的第一道墙通常不是功能，是没人找得到你。国内习惯投信息流、做渠道、做销售。海外公开网络里，Google、文档站、GitHub、AI 引用，才是小团队付得起的入口。
 
