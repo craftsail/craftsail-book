@@ -816,20 +816,12 @@ Organization 用稳定 `@id`：`https://example.com/#organization`。内页用�
 - 只有一种语言，就不做 `hreflang`
 - 不把 FAQ 硬塞进不该回答问题的页面
 - 不把会过期的 ID 写进 `llms.txt`
-- 没有官方 X 账号，就不写 `twitter:site`
 - sitemap 文件还 404，就不要写进 robots
 
 ---
 
 ## 十六、落地清单
 
-### 先问三件事
-
-1. **哪些页是本站自己的标准答案？** 只给这些页独立 URL。
-2. **人点的入口，源码里是不是 `<a href>`？** 按钮、`onclick`、`#/path` 都不算。
-3. **关 JS 打开，正文和链接还在不在？** 不在就还没做完。
-
-`robots.txt`、`sitemap.xml`、`llms.txt`、JSON-LD 都排在这三问后面。
 
 ### 站点根文件
 
@@ -881,23 +873,6 @@ Organization 用稳定 `@id`：`https://example.com/#organization`。内页用�
 - [ ] Rich Results Test 检查 Organization / FAQPage
 - [ ] 分享一次到 Slack / X / LinkedIn，确认卡片图和标题
 - [ ] 用无 JS 环境打开一个内页，正文和导航链接仍在
-
-把域名换成你自己的站：
-
-```bash
-curl -sL https://example.com/help/getting-started/install | grep -E '<title>|<h1|rel="canonical"|href="/help/'
-curl -sL https://example.com/blog/2026-09-19-signups | grep -E '<title>|<article|<figure|BlogPosting'
-```
-
-要对上这些：
-
-- Help 源码里就有 title、H1、canonical，以及 sidebar 上其它 `/help/` 链接（不只当前篇）
-- Blog 源码里有 title、文章正文、图表或数字表
-- `/llms.txt` 是 Markdown，链接都能打开
-- 不存在的路径返回 HTTP 404
-- 旧的 query / hash 地址 301/308 到干净路径
-
-Search Console、Rich Results、社交卡片是上线后的发布清单，不要和写代码混在一起。GEO 会另写。
 
 ---
 
