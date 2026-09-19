@@ -17,9 +17,10 @@
 
 有本站自己的内容，就给独立 URL。没有，就链到别处，不要做薄页。
 
-产品站通常要收录：这是什么、多少钱、怎么装、怎么用。
+产品站通常要收录：这是什么、多少钱、怎么装、怎么用。另外两块要单独做：
 
-文档站通常要收录：概念、教程、API、changelog。
+- **Blog**：持续给搜索引擎新文档，让它回来抓
+- **Help**：给人查用法，sidebar 上堆真实 `<a href>`，让爬虫一次发现整棵文档树
 
 聚合资讯、采集别人的文章，本身不是标准答案。别人已经写过的内容，不要再做一版「本站转载页」去抢收录。英文世界对采集站更敏感。
 
@@ -27,8 +28,8 @@
 | --- | --- | --- | --- |
 | 首页 | 品牌 + 品类 | 品牌 + 品类 | 独立 title；Organization / WebSite |
 | 定价 | `/pricing` | 通常没有 | 价格写在正文，JSON-LD 和可见内容一致 |
-| 内容页 | `/blog/{slug}`、`/changelog/{slug}` | 只有本站独特内容才给独立 URL | 资讯条目 canonical 指向原文 |
-| 文档 / 说明 | `/docs/...`、`/help/...` | `/about/`、来源说明、隐私 | 可见 FAQ + 真链接，不新建空文档站 |
+| Blog | `/blog/{slug}`，每天固定发 | 只有本站数据和观点才发 | 图表 + 可区分的结构；转载不算 |
+| Help | `/help/{path}` + sidebar | `/about/`、来源说明、隐私 | 一篇一个 URL；sidebar 源码里就要有整树 href |
 | App | `/app/`、`/account/`、`/api/` | 同左 | `noindex`，写入 `robots.txt` |
 | 导航 | 侧栏、页脚、面包屑 | 筛选控件也要是链接 | 全部 `<a href>` |
 
@@ -386,17 +387,18 @@ Sitemap: https://example.com/sitemap-index.xml
 
 把希望被收录的 URL 清单交给搜索引擎。它不保证收录，但能加快发现，尤其是新站、文档深、外链少的站点。
 
-大站用 sitemap index，再拆成多个 sitemap 文件。只放稳定文档，例如：
+大站用 sitemap index，再拆成多个 sitemap 文件。Help 稳定、量小，可以和营销页放一起。Blog 日更、量大，单独一个 `sitemap-blog.xml`，`lastmod` 用文章真实发布时间。
 
 ```text
 https://example.com/
 https://example.com/pricing
-https://example.com/docs/getting-started
-https://example.com/blog/why-we-built-this
+https://example.com/help/getting-started/what-is-acme
+https://example.com/help/getting-started/install
+https://example.com/blog/2026-09-19-signups
 https://example.com/about
 ```
 
-不要放 App、登录墙、带 `?category=` 的筛选页、会随快照消失的 ID。
+不要放 App、登录墙、带 `?category=` 的筛选页、会随快照消失的 ID。Blog 每发一篇就进 sitemap，不要等周更。
 
 Google 现行文档：
 
@@ -435,7 +437,8 @@ Google 现行文档：
 ## Start here
 - [Home](https://example.com/): what this is
 - [Pricing](https://example.com/pricing): plans and limits
-- [Docs](https://example.com/docs/getting-started): install and first request
+- [Help](https://example.com/help/getting-started): install and first request
+- [Blog](https://example.com/blog/): data posts and guides
 
 ## Optional
 - [GitHub](https://github.com/acme/acme)
@@ -462,7 +465,7 @@ Google 官方 [JavaScript SEO](https://developers.google.com/search/docs/crawlin
 
 ```html
 <div onclick="go('/pricing')">Pricing</div>
-<button onclick="router.push('/docs')">Docs</button>
+<button onclick="router.push('/help')">Help</button>
 <a href="#" onclick="openPage('install')">Install</a>
 <div class="nav-item" data-href="/pricing">Pricing</div>
 ```
@@ -471,9 +474,9 @@ Google 官方 [JavaScript SEO](https://developers.google.com/search/docs/crawlin
 
 ```html
 <nav>
-  <a href="/docs">Docs</a>
-  <a href="/docs/install">Install</a>
-  <a href="/docs/api">API</a>
+  <a href="/help">Help</a>
+  <a href="/help/install/macos">Install</a>
+  <a href="/blog/">Blog</a>
   <a href="/pricing">Pricing</a>
 </nav>
 ```
@@ -500,11 +503,11 @@ Astro / React / Vue / Next 的 `<a>`、`<Link>`、`<router-link>` 只要最后�
 
 ```html
 <!-- 可以：同一页里跳到章节 -->
-<a href="/docs/install#requirements">Requirements</a>
+<a href="/help/install/macos#requirements">Requirements</a>
 
 <!-- 不行：把整页内容挂在 hash 上 -->
 <a href="/#/pricing">Pricing</a>
-<a href="/docs#install">Install</a>
+<a href="/help#install">Install</a>
 ```
 
 `#` 后面的内容，搜索引擎默认当成同一 URL 的片段。`https://example.com/#/pricing` 和首页在收录上经常被看成同一页。
@@ -518,7 +521,7 @@ Astro / React / Vue / Next 的 `<a>`、`<Link>`、`<router-link>` 只要最后�
 人能用的筛选，爬虫打开列表页时，源码里往往看不到分类文档：
 
 ```text
-/docs?page=install
+/help?page=install
 /blog?category=seo
 /#/pricing
 ```
@@ -526,8 +529,8 @@ Astro / React / Vue / Next 的 `<a>`、`<Link>`、`<router-link>` 只要最后�
 该改成：
 
 ```text
-/docs/install
-/blog/seo
+/help/install/macos
+/blog/2026-09-19-signups
 /pricing
 ```
 
@@ -554,12 +557,12 @@ SPA 常见的 soft 404 是：随便输入一个地址，HTTP 仍是 200，页面
 
 | 部分 | 建议 |
 | --- | --- |
-| 首页、定价、文档、关于 | 静态生成或 SSR，构建期或请求时吐出完整 HTML |
+| 首页、定价、Help、Blog、关于 | 静态生成或 SSR，构建期或请求时吐出完整 HTML |
 | 列表筛选 | 视觉可以像按钮，底层是独立路径 |
 | 真正的产品 App | 可以是 SPA，并 `noindex` |
 | 浏览器里才有意义的工具 | 说明文字进 HTML，交互可以靠 JS |
 
-对文档站，优先选 Docusaurus、VitePress、Mintlify、Astro 这类 SSG。不要用纯客户端 React SPA 硬做 Help。没有独立内容，就不要为了「看起来像大公司」去搭一套空文档站。
+Help 用静态生成或 SSR，sidebar 的链接写在源码里，见第十二节。
 
 ### 4. URL
 
@@ -568,47 +571,213 @@ SPA 常见的 soft 404 是：随便输入一个地址，HTTP 仍是 200，页面
 ```text
 /                    首页
 /pricing             定价
-/docs                文档入口
-/docs/install        安装
-/blog/{slug}         一篇文章
+/help                Help 入口
+/help/install/macos  一篇 Help
+/blog/               Blog 列表
+/blog/{slug}         一篇 Blog
 /about               这是什么
 /privacy             隐私
 ```
 
 - 全小写、短横线、不要空格和驼峰
-- 一层一个主题，不要 `/docs/index.html#/install`
+- 一层一个主题，不要 `/help/index.html#/install`
 - 中英文站用目录或子域分开，并配 `hreflang`。只有一种语言，就不要假装做了双语
 - 改 URL 必须 301/308 到新地址，并更新 sitemap、llms.txt、导航
 
 ---
 
-## 十一、导航、页脚、面包屑
+## 十一、Blog：让搜索引擎持续来抓
 
-用户能从导航跳，爬虫也能从导航发现。每一页的页头、页脚、侧栏、面包屑都应该是真实 `<a href>`：
+首页、定价、Help 改得少。搜索引擎要不要经常回访，看你有没有稳定的新文档。Blog 干这个。
 
-- 新页面更容易被发现
-- 相关页被链接成一组
-- 锚文本就是关键词：`Install`、`Pricing`、`API reference`
+节奏可以定死：**每天 3 篇**，每篇独立 URL，当天进 sitemap，RSS 跟着更新。爬虫发现这个站每天都有新 HTML，就会提高抓取频率。3 篇是给管道的配额，不是凑字数。同一段话换标题发三次，等于在生产薄页。
+
+### 1. 有数据就上图表
+
+纯文字日报，看起来像模板。数字画成图，正文里再放能读的数。爬虫不执行 Canvas。图必须在初始 HTML 里：
+
+- 内联 SVG，或 `<img>` + 写清数字的 `alt`
+- 下面配 `<table>` 或一段结论，图挂了文字还在
+- `<figure>` + `<figcaption>`，caption 用普通人能读的句子，不要只写「图 1」
 
 ```html
-<nav aria-label="Breadcrumb">
-  <a href="/">Home</a>
-  ›
-  <a href="/docs">Docs</a>
-  ›
-  <span>Install</span>
-</nav>
+<figure>
+  <img
+    src="/blog/2026-09-19-signups.png"
+    alt="Daily signups 1–19 Sep 2026. Peak 420 on 12 Sep."
+    width="1200"
+    height="630"
+  />
+  <figcaption>9 月前 19 天注册量，12 日最高 420。</figcaption>
+</figure>
+<table>
+  <thead>
+    <tr><th>Date</th><th>Signups</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>2026-09-12</td><td>420</td></tr>
+  </tbody>
+</table>
 ```
 
-并配 `BreadcrumbList` JSON-LD。搜索结果里有机会出现 `Home > Docs > Install`。
+有数据管道就从管道出这 3 篇，不要手写灌水。没数据的那篇就别发。
 
-Help / Docs 把侧栏做成「一篇正文 + 左侧一排真链接」。折叠可以用 CSS / JS，但折叠前源码里就要有这些 `<a>`。不要等点击分组后才把子链接插入 DOM。
+### 2. 结构要能区分
 
-对照 Stripe Docs、Cloudflare Docs、GitHub Docs。不要对照把帮助中心做成 iframe、纯 SPA、或「搜索框 + 无链接结果」的知识库。
+三篇不要套同一套「引言 — 三点 — 总结」。类型不同，HTML 骨架就不同，爬虫和人才能看出这是三份文档，不是一个模板填了三次。
+
+| 类型 | URL 例子 | 骨架 |
+| --- | --- | --- |
+| 数据 / 日报 | `/blog/2026-09-19-signups` | 一句话结论 → 图 → 数字表 → 比昨天多了什么 |
+| 教程 | `/blog/install-cli-on-macos` | 步骤用 `h2`，命令进 `<pre>` |
+| 对比 | `/blog/acme-vs-foo-pricing` | 对照表，列是产品，行是项 |
+
+`og:type=article`，补 `article:published_time`。JSON-LD 用 `BlogPosting`，`image` 指向那张图。列表页 `/blog/` 是 `CollectionPage`，不要把全部正文堆进列表。
+
+### 3. 发现路径
+
+```text
+/blog/                      列表
+/blog/2026-09-19-signups    一篇
+/rss.xml                    全文或摘要均可
+/sitemap-blog.xml           只放已发布、200、canonical 的文章
+```
+
+页头、页脚、相邻文章、相关 Help 都用 `<a href>` 指过来。新文章只出现在首页 JS 里、不进 sitemap、没有内链，爬虫来得慢。
+
+转载、RSS 搬运、把别人的 changelog 改写一遍，都不进 `/blog/`。那些该链到原文。
 
 ---
 
-## 十二、按页面类型写静态信息
+## 十二、Help 要有侧栏：这是在给搜索引擎铺内链
+
+用户能从侧栏跳，爬虫也能从侧栏发现。Help 做成「一篇正文 + 左侧一排 `<a href>`」，是文档站最划算的 SEO 结构。
+
+没有侧栏的 Help，往往是一个单页，或者每次只渲染当前篇。爬虫进来只能看到这一篇，深处文档要靠 sitemap 碰运气。
+
+有侧栏之后，每一篇文档的 HTML 里都会带上几十个指向兄弟页面的真实链接：
+
+- 新文档更容易被发现
+- 主题簇（getting started、AI、权限、安装）被链接成一组
+- 锚文本就是关键词：`Install on Kubernetes`、`Bring your own model`
+
+这就是为什么 Stripe、Cloudflare、MDN、GitHub Docs 全都把侧栏做成真链接，而不是折叠后的 JS 菜单。
+
+### 1. 侧栏必须是 HTML 链接，不能是点开才加载的树
+
+```html
+<aside>
+  <nav aria-label="Help">
+    <a href="/help">Help Center</a>
+
+    <p>Getting started</p>
+    <a href="/help/getting-started/what-is-acme">What is Acme</a>
+    <a href="/help/getting-started/install">Install on Kubernetes</a>
+    <a href="/help/getting-started/license">Get a license</a>
+    <a href="/help/getting-started/first-workspace">Create the first workspace</a>
+
+    <p>AI</p>
+    <a href="/help/ai/agents">How AI agents edit documents</a>
+    <a href="/help/ai/byok">Bring your own model</a>
+    <a href="/help/ai/history">See agent edits in history</a>
+
+    <p>Security</p>
+    <a href="/help/security/permissions">Document permissions</a>
+    <a href="/help/security/audit-logs">Audit logs</a>
+    <a href="/help/security/private-cloud">Private cloud boundary</a>
+  </nav>
+</aside>
+
+<article>
+  <h1>Install Acme on Kubernetes</h1>
+  <p>...</p>
+</article>
+```
+
+折叠可以用 CSS / JS，但折叠前源码里就要有这些 `<a>`。不要等点击「AI」分组后才把子链接插入 DOM。`<details open>` 可以，点击后再 `fetch` 子树不行。
+
+当前篇用 `<span>` 或 `aria-current="page"`，其余全部是链接。锚文本写人会搜的词，不要全写 `Click here`。
+
+```bash
+curl -sL https://example.com/help/getting-started/install | grep 'href="/help/'
+```
+
+源码里应出现 What is Acme、Bring your own model、Audit logs 这些兄弟链接，不只是当前这篇。Google 也许能渲染客户端 sidebar，Bing 和不少 AI 爬虫不能。
+
+优先 Docusaurus、VitePress、Mintlify、Astro。它们默认就是「一篇正文 + 左侧一排真链接」。不要用纯客户端 React SPA 硬做 Help。
+
+### 2. 一篇文档里再放相关链接和面包屑
+
+侧栏是纵向发现，正文里的相关链接是横向加分。
+
+```html
+<nav aria-label="Breadcrumb">
+  <a href="/help">Help</a>
+  ›
+  <a href="/help/getting-started">Getting started</a>
+  ›
+  <span>Install</span>
+</nav>
+
+<article>
+  <h1>Install Acme on Kubernetes</h1>
+  <p>...</p>
+</article>
+
+<section>
+  <h2>Next</h2>
+  <a href="/help/getting-started/license">Get a license</a>
+  <a href="/help/ai/byok">Bring your own model</a>
+  <a href="/pricing">See pricing</a>
+</section>
+```
+
+面包屑配 `BreadcrumbList` JSON-LD。文档层级深的站点，搜索结果里有机会出现 `Help > Getting started > Install`。
+
+### 3. 一个 URL 回答一个问题
+
+文档站不要写成产品手册目录。
+
+| 弱页面 | 更有搜索价值的页面 |
+| --- | --- |
+| `/help/overview` | `/help/getting-started/what-is-acme` |
+| `/help/ai` | `/help/ai/byok`、`/help/ai/agents` |
+| `/help/faq` 一页装 40 问 | 高频问题各写一篇；入口页 FAQ 只留 6–8 个链接 |
+| `/help/security` | `/help/security/permissions`、`/help/security/audit-logs` |
+
+每篇固定结构：
+
+1. H1 就是问题或任务
+2. 前两段直接给结论
+3. 步骤 / 注意 / 限制
+4. 相关链接
+5. 最后更新时间
+
+这就是标准答案页。Help 侧栏把这些页连成网，搜索和 AI 才找得到、愿意引用。GEO 会另写。
+
+### 4. 可以对照的文档站
+
+打开这些页面的「查看源代码」，都能看到侧栏里成排的 `href`：
+
+- https://docs.stripe.com/payments/checkout
+- https://developers.cloudflare.com/workers/get-started/guide/
+- https://docs.github.com/en/get-started/start-your-journey/about-github-and-git
+- https://docusaurus.io/docs/seo
+- https://mintlify.com/docs/ai/llmstxt
+
+不要对照的：把帮助中心做成一个 iframe、一个 SPA、一个「搜索框 + 无链接结果」的知识库。那类系统对人也许能搜，对爬虫是黑盒。
+
+---
+
+## 十三、导航、页脚
+
+页头、页脚也要是真实 `<a href>`。Help 的侧栏、面包屑、文末 Next 见上一节，不要只在首页放一个「Docs」按钮。
+
+页脚把 Blog、Help、定价都链上。营销页之间同样用真链接互指，不要只靠 JS 路由。
+
+---
+
+## 十四、按页面类型写静态信息
 
 首页那段 `<head>` 只能当首页用。内页要改 title、description、canonical、og:url、JSON-LD。
 
@@ -618,8 +787,8 @@ Help / Docs 把侧栏做成「一篇正文 + 左侧一排真链接」。折叠�
 | --- | --- | --- |
 | `/` | 品牌 + 品类 | Organization + WebSite + SoftwareApplication |
 | `/pricing` | `Pricing — {品牌}` | 价格在正文里，和 schema 一致 |
-| `/docs/{path}` | 这一页的问题 | TechArticle / FAQPage |
-| `/blog/{slug}` | 文章标题 | Article；`og:type=article` |
+| `/help/{path}` | 这一页的问题 | TechArticle / FAQPage |
+| `/blog/{slug}` | 文章标题 | BlogPosting；`og:type=article`；有图就写 `image` |
 | `/about` | `About {品牌}` | WebPage；需要时加 FAQPage |
 | `/app`、`/account` | 不收录 | `noindex`，不进 sitemap |
 
@@ -627,16 +796,21 @@ Organization 用稳定 `@id`：`https://example.com/#organization`。内页用�
 
 - 首页：`SoftwareApplication` 的价格必须和定价页可见内容一致
 - `/pricing`：价格写在正文里，不只写在按钮上
-- `/blog/{slug}`、`/docs/{path}`：一篇一个 URL，进 sitemap 和 `llms.txt`
+- `/blog/{slug}`、`/help/{path}`：一篇一个 URL，进 sitemap。Help 稳定入口写进 `llms.txt`；Blog 只把常青文写进去，日报不必进 `llms.txt`
 - App：`noindex`，不要放进 sitemap
 
 聚合站把 `SoftwareApplication` 换成目录类型，ItemList 指向原文，FAQ 不要塞进数据首屏。
 
 ---
 
-## 十三、不要做的事
+## 十五、不要做的事
 
-- 不为每条 RSS / 转载做本站文章页
+- 不为每条 RSS / 转载做本站文章页；Blog 日更必须带本站数据或本站步骤
+- 图表只画在 Canvas / 客户端 chart 里，源码里没有数字
+- 三篇 Blog 共用一个 HTML 骨架，只换标题
+- Help sidebar 靠 JS 点击后才插入链接
+- Help 做成 iframe、纯 SPA、或「搜索框 + 无链接结果」的知识库
+- `/help/faq` 一页塞几十问，不给高频问题独立 URL
 - 没有独立内容，就不新建 Docusaurus / VitePress Help
 - 不写 `meta keywords`，不编评分
 - 只有一种语言，就不做 `hreflang`
@@ -647,7 +821,7 @@ Organization 用稳定 `@id`：`https://example.com/#organization`。内页用�
 
 ---
 
-## 十四、落地清单
+## 十六、落地清单
 
 ### 先问三件事
 
@@ -674,10 +848,28 @@ Organization 用稳定 `@id`：`https://example.com/#organization`。内页用�
 - [ ] 需要的 JSON-LD，且与可见内容一致
 - [ ] 这些标签在「查看源代码」里就有，不是 JS 后插入
 
+### Blog
+
+- [ ] `/blog/{slug}` 一篇一个 URL，`og:type=article`
+- [ ] 每天固定 3 篇则 3 个新 URL，当天进 `sitemap-blog.xml` 和 RSS
+- [ ] 有数据的篇：图在 HTML 里（SVG 或 `<img>`），旁边有表或可读数字
+- [ ] 数据篇 / 教程 / 对比不是同一套 DOM
+- [ ] 转载不进 `/blog/`
+
+### Help
+
+- [ ] `/help/{path}` 一篇一个 URL，一个问题，没有 `#/`
+- [ ] 关 JS 打开任一 Help 页，源码里能搜到 sidebar 上其它文档的 `href="/help/`
+- [ ] 折叠用 CSS / `<details>`，不靠点击再插入链接
+- [ ] 锚文本是问题本身：`Install on Kubernetes`、`Bring your own model`
+- [ ] 每篇有面包屑、文末相关链接；面包屑配 `BreadcrumbList`
+- [ ] H1 是问题或任务，前两段先给结论，页脚有最后更新时间
+- [ ] 高频 FAQ 各写一篇，不要一页装 40 问
+
 ### URL 与链接
 
-- [ ] 主题、关于、文档、定价、对比都是独立路径，没有 `#/`
-- [ ] 导航、卡片、筛选、页脚、按钮式入口全部是 `<a href>`
+- [ ] 主题、关于、Help、定价、对比、Blog 都是独立路径，没有 `#/`
+- [ ] 导航、卡片、筛选、页脚、sidebar、按钮式入口全部是 `<a href>`
 - [ ] 源码里能搜到这些 href
 - [ ] 不存在的文档返回 HTTP 404
 - [ ] 改版旧地址 301/308 到新地址
@@ -693,12 +885,14 @@ Organization 用稳定 `@id`：`https://example.com/#organization`。内页用�
 把域名换成你自己的站：
 
 ```bash
-curl -sL https://example.com/docs/install | grep -E '<title>|<h1|rel="canonical"|application/ld\+json|href="'
+curl -sL https://example.com/help/getting-started/install | grep -E '<title>|<h1|rel="canonical"|href="/help/'
+curl -sL https://example.com/blog/2026-09-19-signups | grep -E '<title>|<article|<figure|BlogPosting'
 ```
 
 要对上这些：
 
-- 源码里就有 title、H1、canonical、JSON-LD、导航 `<a href>`
+- Help 源码里就有 title、H1、canonical，以及 sidebar 上其它 `/help/` 链接（不只当前篇）
+- Blog 源码里有 title、文章正文、图表或数字表
 - `/llms.txt` 是 Markdown，链接都能打开
 - 不存在的路径返回 HTTP 404
 - 旧的 query / hash 地址 301/308 到干净路径
@@ -740,4 +934,6 @@ Search Console、Rich Results、社交卡片是上线后的发布清单，不要
 - 文中 HTML 的来源：<https://craftsail.com/>、<https://craftsail.com/news/ai/>、<https://craftsail.com/about/>、<https://craftsail.com/llms.txt>
 - [Stripe Docs](https://docs.stripe.com/payments/checkout)
 - [Cloudflare Docs](https://developers.cloudflare.com/workers/get-started/guide/)
-- [GitHub Docs](https://docs.github.com/en/get-started/start-your-journey)
+- [GitHub Docs](https://docs.github.com/en/get-started/start-your-journey/about-github-and-git)
+- [Docusaurus SEO](https://docusaurus.io/docs/seo)
+- [Mintlify llms.txt](https://mintlify.com/docs/ai/llmstxt)
