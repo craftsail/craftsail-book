@@ -1,0 +1,54 @@
+<!doctype html><html><head><meta charset="utf-8"><style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{width:1600px;height:900px;background:#FBF8F1;font-family:"PingFang SC","Hiragino Sans GB",sans-serif;color:#0B2A4A;position:relative;overflow:hidden}
+.top{position:absolute;left:90px;top:70px;right:90px;display:flex;justify-content:space-between;align-items:flex-start}
+h1{font-size:76px;font-weight:700;letter-spacing:2px}
+.slogan{margin-top:22px;font-size:30px;color:#3F7A85}
+.slogan b{color:#E05A33;font-weight:600}
+.logo{width:124px;height:124px;border-radius:50%;mix-blend-mode:multiply}
+.stage{position:absolute;left:90px;right:90px;top:330px;height:400px;display:flex;align-items:center;justify-content:space-between}
+.side{width:300px;height:300px;border-radius:24px;padding:36px 32px;display:flex;flex-direction:column;justify-content:center}
+.prod{background:#E9E4D8}
+.cons{background:#0B2A4A;color:#FBF8F1}
+.side .k{font-size:22px;letter-spacing:4px;opacity:.7}
+.side .t{font-size:46px;font-weight:700;margin:10px 0 18px}
+.side .d{font-size:24px;line-height:1.6}
+.cons .d{color:#F4C9B8}
+.mid{flex:1;height:100%;position:relative}
+svg{position:absolute;inset:0}
+.hub{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);text-align:center}
+.hub .name{font-size:40px;font-weight:700}
+.hub .sub{font-size:20px;color:#3F7A85;margin-top:6px;letter-spacing:2px}
+.node{position:absolute;width:300px;padding:16px 18px;border-radius:16px;background:#fff;box-shadow:0 6px 18px rgba(11,42,74,.10);text-align:center}
+.node .n{font-size:23px;white-space:nowrap;font-weight:700;font-family:Menlo,monospace}
+.node .r{font-size:20px;margin-top:6px;color:#3F7A85}
+.book{left:50%;top:0;transform:translateX(-50%)}
+.growth{left:50%;bottom:0;transform:translateX(-50%)}
+.book .n{color:#3F7A85}.growth .n{color:#E05A33}
+.foot{position:absolute;left:90px;right:90px;bottom:56px;display:flex;justify-content:space-between;font-size:26px}
+.foot .u{color:#3F7A85;font-family:Menlo,monospace;font-size:22px}
+</style></head><body>
+<div class="top">
+  <div><h1>把运营当成一道建模题</h1>
+  <div class="slogan">技术很好，运营不行，<b>只是产品死得体面一点</b></div></div>
+  <img class="logo" src="../../assets/logo.png">
+</div>
+<div class="stage">
+  <div class="side prod"><div class="k">国内</div><div class="t">生产端</div><div class="d">产品趋同<br>功能、价格、加班</div></div>
+  <div class="mid">
+    <svg viewBox="0 0 820 400" preserveAspectRatio="none">
+      <defs><marker id="a" markerWidth="12" markerHeight="12" refX="9" refY="6" orient="auto"><path d="M0,0 L12,6 L0,12 z" fill="#E05A33"/></marker>
+      <marker id="b" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#3F7A85"/></marker></defs>
+      <path d="M20,200 L200,200" stroke="#E05A33" stroke-width="5" fill="none" stroke-dasharray="2 12" stroke-linecap="round"/>
+      <path d="M620,200 L790,200" stroke="#E05A33" stroke-width="5" fill="none" marker-end="url(#a)"/>
+      <path d="M545,95 C640,150 640,250 545,305" stroke="#3F7A85" stroke-width="3" fill="none" marker-end="url(#b)"/>
+      <path d="M275,305 C180,250 180,150 275,95" stroke="#3F7A85" stroke-width="3" fill="none" marker-end="url(#b)"/>
+    </svg>
+    <div class="node book"><div class="n">craftsail-book</div><div class="r">读 · 收集、整理、学习</div></div>
+    <div class="hub"><div class="name">运营中台</div><div class="sub">理论 ⇄ 实践</div></div>
+    <div class="node growth"><div class="n">craftsail-growth</div><div class="r">算 · 落地、验证</div></div>
+  </div>
+  <div class="side cons"><div class="k">海外</div><div class="t">消费端</div><div class="d">愿意付费的用户<br>大家都有钱赚</div></div>
+</div>
+<div class="foot"><div>技术是入场券，运营决定产品能走多远</div><div class="u">craftsail.com</div></div>
+</body></html>
