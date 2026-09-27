@@ -8,6 +8,7 @@
 2. 每个可收录页的静态信息写对
 3. 根目录放好 `robots.txt`、`sitemap.xml`、`llms.txt`
 4. 可点击入口都是真实的 `<a href>`，指向独立 URL
+5. 营销页、Blog、Help 用 Astro 静态吐 HTML：Blog 做成带分页的 feed 流，Help 带整树 sidebar
 
 文中 HTML 来自 [craftsail.com](https://craftsail.com)，方便你对照线上源码。方法对产品站、文档站同样成立。
 
@@ -19,7 +20,7 @@
 
 产品站通常要收录：这是什么、多少钱、怎么装、怎么用。另外两块要单独做：
 
-- **Blog**：持续给搜索引擎新文档，让它回来抓
+- **Blog**：持续给搜索引擎新文档，让它回来抓。`/blog/` 做成按时间倒序的 feed 流
 - **Help**：给人查用法，sidebar 上堆真实 `<a href>`，让爬虫一次发现整棵文档树
 
 聚合资讯、采集别人的文章，本身不是标准答案。别人已经写过的内容，不要再做一版「本站转载页」去抢收录。英文世界对采集站更敏感。
@@ -28,7 +29,7 @@
 | --- | --- | --- | --- |
 | 首页 | 品牌 + 品类 | 品牌 + 品类 | 独立 title；Organization / WebSite |
 | 定价 | `/pricing` | 通常没有 | 价格写在正文，JSON-LD 和可见内容一致 |
-| Blog | `/blog/{slug}`，每天固定发 | 只有本站数据和观点才发 | 图表 + 可区分的结构；转载不算 |
+| Blog | `/blog/` feed 流 + `/blog/{slug}`，每天固定发 | 只有本站数据和观点才发 | 列表倒序分页；文章带图表 + 可区分的结构；转载不算 |
 | Help | `/help/{path}` + sidebar | `/about/`、来源说明、隐私 | 一篇一个 URL；sidebar 源码里就要有整树 href |
 | App | `/app/`、`/account/`、`/api/` | 同左 | `noindex`，写入 `robots.txt` |
 | 导航 | 侧栏、页脚、面包屑 | 筛选控件也要是链接 | 全部 `<a href>` |
@@ -562,7 +563,7 @@ SPA 常见的 soft 404 是：随便输入一个地址，HTTP 仍是 200，页面
 | 真正的产品 App | 可以是 SPA，并 `noindex` |
 | 浏览器里才有意义的工具 | 说明文字进 HTML，交互可以靠 JS |
 
-Help 用静态生成或 SSR，sidebar 的链接写在源码里，见第十二节。
+框架怎么选见第十一节。Help 用静态生成或 SSR，sidebar 的链接写在源码里，见第十三节。
 
 ### 4. URL
 
@@ -586,13 +587,163 @@ Help 用静态生成或 SSR，sidebar 的链接写在源码里，见第十二节
 
 ---
 
-## 十一、Blog：让搜索引擎持续来抓
+## 十一、框架：内容站用 Astro，不用 Next.js
+
+前面每一节都在要求同一件事：**关掉 JS 打开，HTML 里什么都有**。另一件事是快。Core Web Vitals 进排序，海外用户离你的服务器远，首屏多下发的每一百 KB JS 都是真的慢。
+
+营销页、Blog、Help 本质是文档。给文档站选框架，先看两点：默认吐出什么 HTML，默认下发多少 JS。
+
+craftsail.com 用的是 Astro，第四节那行 `/_astro/...woff2` 就是它的构建产物。
+
+### 1. 对比
+
+| 维度 | Astro | Next.js |
+| --- | --- | --- |
+| 默认下发的 JS | 0。只有标了 `client:*` 的组件才下发 JS（island） | React 运行时 + 路由，每页都要水合。Server Components 能少发组件代码，运行时省不掉 |
+| 首屏速度 | 纯 HTML + CSS，LCP、INP 不用调就容易达标 | 能做到，但要持续压 bundle、盯住 `'use client'` 的边界 |
+| 默认渲染 | 构建期静态生成，按页开 SSR | SSR / SSG / ISR / RSC 都有，模型复杂 |
+| 内容管理 | Content Collections：Markdown / MDX + schema 校验 | 要自己接 MDX 或第三方内容库 |
+| Blog feed 流 | `paginate()` 出分页 URL，`@astrojs/rss` 出 RSS，都是官方的 | 自己写分页路由和 RSS route handler |
+| Help sidebar | Starlight 官方文档主题，整树 sidebar 开箱 | Nextra、Fumadocs 等第三方 |
+| sitemap | `@astrojs/sitemap` | `app/sitemap.ts` 内置 |
+| 部署 | 产物是静态文件，任何 CDN、Cloudflare Pages、GitHub Pages、Nginx 都行 | 完整能力在 Vercel 最顺；`output: 'export'` 纯静态导出会丢掉 ISR、middleware、默认图片优化等 |
+| 交互重的 App | 弱。island 之间共享状态要自己处理 | 强项 |
+| 生态、招人 | 小一些，但可以在 island 里直接用 React / Vue / Svelte 组件 | React 生态最大 |
+
+### 2. Astro 的短板
+
+- **跨页跳转是整页加载**。开 `prefetch`，或用 `<ClientRouter />` 做页面过渡，体感能补回大半
+- **island 各自独立**。多个交互组件共享状态，要用 nanostores 之类自己接
+- **全静态时，发文要重新构建部署**。日更 3 篇、几千篇的规模没问题；上万篇再考虑按需 SSR 或拆分构建
+- **登录后的复杂 App 不是它的强项**
+
+### 3. Next.js 放在内容站上的问题
+
+- 纯文字页也要下发 React 运行时并水合，这部分 JS 对爬虫和读者都没用
+- 渲染、缓存模型多，一个 `'use client'` 放错位置，整棵子树都变成客户端组件
+- 离开 Vercel 自托管，ISR、图片优化、缓存都要自己兜
+- Blog + Help 用不上它的大部分能力，成本却要全付
+
+Next.js 不是做不好 SEO，是要花额外的功夫才能做到 Astro 的默认值。
+
+### 4. 怎么分
+
+| 部分 | 用什么 |
+| --- | --- |
+| 首页、定价、关于、Blog、Help | Astro 静态生成；Help 用 Starlight 或自己写 sidebar 组件 |
+| 页面上的少量交互：搜索框、订阅表单、图表 hover | Astro 里挂 island：`client:idle`、`client:visible` |
+| 登录后的 App、编辑器、控制台 | React、Next、任何 SPA 都行；放 `/app/` 或 `app.` 子域，`noindex` |
+
+给爬虫和新用户看的部分用 Astro，给登录用户用的部分再谈 React。
+
+```astro
+---
+import SearchBox from '../components/SearchBox.tsx';
+---
+<!-- 只有这一个组件下发 JS，浏览器空闲时才加载 -->
+<SearchBox client:idle />
+```
+
+### 5. 基础配置
+
+```js
+// astro.config.mjs
+import { defineConfig } from 'astro/config';
+import sitemap from '@astrojs/sitemap';
+
+export default defineConfig({
+  site: 'https://example.com',      // canonical、sitemap、RSS 都靠它拼绝对 URL
+  prefetch: { prefetchAll: true },  // 鼠标悬停就预取下一页，补回跨页速度
+  integrations: [sitemap()],
+});
+```
+
+- `site` 必须写，不写 sitemap 和 RSS 拼不出绝对地址
+- 尾斜杠只留一种（`trailingSlash`），和部署平台的行为、canonical、sitemap 对齐
+- 图片用 `astro:assets` 的 `<Image />`，自动带 `width` / `height`，不产生 CLS
+
+### 6. 验收速度
+
+- `curl -s https://example.com/blog/ | grep -c '<script'`：内容页应该接近 0
+- PageSpeed Insights 移动端跑三页：首页、一篇 Blog、一篇 Help
+- 目标按 Google 的「良好」线：LCP < 2.5s，INP < 200ms，CLS < 0.1
+
+---
+
+## 十二、Blog：用 feed 流让搜索引擎持续来抓
 
 首页、定价、Help 改得少。搜索引擎要不要经常回访，看你有没有稳定的新文档。Blog 干这个。
 
 节奏可以定死：**每天 3 篇**，每篇独立 URL，当天进 sitemap，RSS 跟着更新。爬虫发现这个站每天都有新 HTML，就会提高抓取频率。3 篇是给管道的配额，不是凑字数。同一段话换标题发三次，等于在生产薄页。
 
-### 1. 有数据就上图表
+### 1. `/blog/` 做成 feed 流
+
+按发布时间倒序排成一条流，最新的在最上面。每天 3 篇进来，`/blog/` 这一页的 HTML 每天都在变。爬虫回访这一页，一次就拿到当天所有新链接。
+
+流里每一条是卡片，不是全文：
+
+```html
+<main>
+  <h1>Blog</h1>
+
+  <nav aria-label="Blog 分类">
+    <a href="/blog/" aria-current="page">全部</a>
+    <a href="/blog/type/data/">数据</a>
+    <a href="/blog/type/guide/">教程</a>
+    <a href="/blog/type/compare/">对比</a>
+  </nav>
+
+  <ol class="feed">
+    <li>
+      <article>
+        <a href="/blog/2026-09-19-signups">
+          <img
+            src="/blog/2026-09-19-signups.png"
+            alt="Daily signups 1–19 Sep 2026. Peak 420 on 12 Sep."
+            width="600"
+            height="315"
+          />
+          <h2>9 月注册量：12 日到峰值 420</h2>
+        </a>
+        <p><time datetime="2026-09-19">2026-09-19</time> · 数据</p>
+        <p>前 19 天注册 4,860，比 8 月同期多 31%。</p>
+      </article>
+    </li>
+    <!-- 每页 20 条 -->
+  </ol>
+
+  <nav aria-label="分页">
+    <a href="/blog/2" rel="next">更早的文章</a>
+  </nav>
+</main>
+```
+
+- 卡片标题是 `<a href>`，指向文章独立 URL
+- 卡片只放标题、日期、类型、一两句摘要、缩略图。全文只在文章页，不要列表页和文章页各一份
+- `<time datetime>` 写真实发布时间
+- 分类是独立路径 `/blog/type/data/`，不是 `?type=data`，也不是前端 Tab 过滤
+- 首屏第一张缩略图不要 `loading="lazy"`，它往往就是 LCP；后面的可以 lazy
+- 首页放最新 5–10 条同样的卡片，链到 `/blog/`
+
+### 2. 可以无限滚动，底下必须是分页 URL
+
+feed 流最常见的坑：只做「滚到底自动加载」。爬虫不滚动，也不点「加载更多」，只看得到第一屏 20 篇，更早的文章只能靠 sitemap。
+
+Google 对无限滚动的建议是：背后要有一组能直接打开的分页 URL。
+
+```text
+/blog/      最新 20 篇
+/blog/2     第 21–40 篇
+/blog/3     ...
+```
+
+- 每一页 HTML 里都有指向上一页 / 下一页的 `<a href>`
+- 「加载更多」底子是 `<a href="/blog/2">`。JS 可以接管它，把下一页拼到当前列表，再用 `history.pushState` 把地址改成 `/blog/2`；关了 JS，它就是一个普通链接
+- 每个分页页 canonical 指向自己，不要全部指回 `/blog/`
+- 分页页 title 带页码：`Blog — Page 2 — Acme`
+- 分页页不必进 sitemap，文章页必须进
+
+### 3. 有数据就上图表
 
 纯文字日报，看起来像模板。数字画成图，正文里再放能读的数。爬虫不执行 Canvas。图必须在初始 HTML 里：
 
@@ -622,7 +773,7 @@ Help 用静态生成或 SSR，sidebar 的链接写在源码里，见第十二节
 
 有数据管道就从管道出这 3 篇，不要手写灌水。没数据的那篇就别发。
 
-### 2. 结构要能区分
+### 4. 结构要能区分
 
 三篇不要套同一套「引言 — 三点 — 总结」。类型不同，HTML 骨架就不同，爬虫和人才能看出这是三份文档，不是一个模板填了三次。
 
@@ -634,22 +785,89 @@ Help 用静态生成或 SSR，sidebar 的链接写在源码里，见第十二节
 
 `og:type=article`，补 `article:published_time`。JSON-LD 用 `BlogPosting`，`image` 指向那张图。列表页 `/blog/` 是 `CollectionPage`，不要把全部正文堆进列表。
 
-### 3. 发现路径
+### 5. 发现路径和订阅
 
 ```text
-/blog/                      列表
+/blog/                      feed 第一页
+/blog/2                     feed 分页
+/blog/type/data/            分类 feed
 /blog/2026-09-19-signups    一篇
-/rss.xml                    全文或摘要均可
+/rss.xml                    RSS，全文或摘要均可
 /sitemap-blog.xml           只放已发布、200、canonical 的文章
 ```
+
+- 每页 `<head>` 都带 `<link rel="alternate" type="application/rss+xml" href="/rss.xml">`
+- RSS 放最新 20–50 篇，`pubDate` 是真实发布时间，`link` 是 canonical URL
+- 页面上的 feed 流和 RSS 用同一份数据、同一个排序，不要两边对不上
 
 页头、页脚、相邻文章、相关 Help 都用 `<a href>` 指过来。新文章只出现在首页 JS 里、不进 sitemap、没有内链，爬虫来得慢。
 
 转载、RSS 搬运、把别人的 changelog 改写一遍，都不进 `/blog/`。那些该链到原文。
 
+### 6. 用 Astro 写 feed 流
+
+文章放在 Content Collection 里，排序抽成一个函数，feed 页和 RSS 共用：
+
+```ts
+// src/lib/posts.ts
+import { getCollection } from 'astro:content';
+
+export async function getPosts() {
+  const posts = await getCollection('blog', ({ data }) => !data.draft);
+  return posts.sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+}
+```
+
+`[...page].astro` 让第一页落在 `/blog/`，后面是 `/blog/2`、`/blog/3`，构建期全部生成静态 HTML：
+
+```astro
+---
+// src/pages/blog/[...page].astro
+import { getPosts } from '../../lib/posts';
+import PostCard from '../../components/PostCard.astro';
+
+export async function getStaticPaths({ paginate }) {
+  return paginate(await getPosts(), { pageSize: 20 });
+}
+
+const { page } = Astro.props;
+---
+<ol class="feed">
+  {page.data.map((post) => <li><PostCard post={post} /></li>)}
+</ol>
+
+<nav aria-label="分页">
+  {page.url.prev && <a href={page.url.prev} rel="prev">更新的文章</a>}
+  {page.url.next && <a href={page.url.next} rel="next">更早的文章</a>}
+</nav>
+```
+
+```js
+// src/pages/rss.xml.js
+import rss from '@astrojs/rss';
+import { getPosts } from '../lib/posts';
+
+export async function GET(context) {
+  const posts = (await getPosts()).slice(0, 50);
+  return rss({
+    title: 'Acme Blog',
+    description: 'Daily data posts and guides from Acme.',
+    site: context.site,
+    items: posts.map((post) => ({
+      title: post.data.title,
+      description: post.data.description,
+      pubDate: post.data.pubDate,
+      link: `/blog/${post.id}`,
+    })),
+  });
+}
+```
+
+文章 slug 用日期或英文短语（`2026-09-19-signups`），不要用纯数字，免得和分页 `/blog/2` 撞路径。
+
 ---
 
-## 十二、Help 要有侧栏：这是在给搜索引擎铺内链
+## 十三、Help 要有侧栏：这是在给搜索引擎铺内链
 
 用户能从侧栏跳，爬虫也能从侧栏发现。Help 做成「一篇正文 + 左侧一排 `<a href>`」，是文档站最划算的 SEO 结构。
 
@@ -704,7 +922,7 @@ curl -sL https://example.com/help/getting-started/install | grep 'href="/help/'
 
 源码里应出现 What is Acme、Bring your own model、Audit logs 这些兄弟链接，不只是当前这篇。Google 也许能渲染客户端 sidebar，Bing 和不少 AI 爬虫不能。
 
-优先 Docusaurus、VitePress、Mintlify、Astro。它们默认就是「一篇正文 + 左侧一排真链接」。不要用纯客户端 React SPA 硬做 Help。
+优先 Astro（Starlight 或自己写组件，见本节第 5 小节）；Docusaurus、VitePress、Mintlify 也行。它们默认就是「一篇正文 + 左侧一排真链接」。不要用纯客户端 React SPA 硬做 Help。
 
 ### 2. 一篇文档里再放相关链接和面包屑
 
@@ -767,9 +985,66 @@ curl -sL https://example.com/help/getting-started/install | grep 'href="/help/'
 
 不要对照的：把帮助中心做成一个 iframe、一个 SPA、一个「搜索框 + 无链接结果」的知识库。那类系统对人也许能搜，对爬虫是黑盒。
 
+### 5. 用 Astro 写 Help sidebar
+
+**省事：Starlight。** Astro 官方的文档主题。sidebar、上一篇 / 下一篇、页内目录、Pagefind 站内搜索都开箱；分组折叠用的是 `<details>`，整树链接在源码里。面包屑默认没有，要自己覆盖组件或装社区插件。
+
+```js
+// astro.config.mjs
+import { defineConfig } from 'astro/config';
+import starlight from '@astrojs/starlight';
+
+export default defineConfig({
+  site: 'https://example.com',
+  integrations: [
+    starlight({
+      title: 'Acme Help',
+      sidebar: [
+        { label: 'Getting started', autogenerate: { directory: 'help/getting-started' } },
+        { label: 'AI', autogenerate: { directory: 'help/ai' } },
+        { label: 'Security', autogenerate: { directory: 'help/security' } },
+      ],
+    }),
+  ],
+});
+```
+
+文档放 `src/content/docs/help/getting-started/install.md`，URL 就是 `/help/getting-started/install`。
+
+**要和主站同一套样式：自己写 sidebar 组件。** 它在构建期运行，输出就是整树 `<a>`，没有一行客户端 JS：
+
+```astro
+---
+// src/components/HelpSidebar.astro
+import { getCollection } from 'astro:content';
+
+const docs = (await getCollection('help')).sort((a, b) => a.data.order - b.data.order);
+const groups = Object.groupBy(docs, (doc) => doc.data.group);
+const current = Astro.url.pathname;
+---
+<nav aria-label="Help">
+  <a href="/help">Help Center</a>
+  {Object.entries(groups).map(([group, items]) => (
+    <details open>
+      <summary>{group}</summary>
+      {items.map((doc) => {
+        const href = `/help/${doc.id}`;
+        return (
+          <a href={href} aria-current={href === current ? 'page' : undefined}>
+            {doc.data.title}
+          </a>
+        );
+      })}
+    </details>
+  ))}
+</nav>
+```
+
+两种做法都用第 1 小节那条 `curl | grep 'href="/help/'` 验收。
+
 ---
 
-## 十三、导航、页脚
+## 十四、导航、页脚
 
 页头、页脚也要是真实 `<a href>`。Help 的侧栏、面包屑、文末 Next 见上一节，不要只在首页放一个「Docs」按钮。
 
@@ -777,7 +1052,7 @@ curl -sL https://example.com/help/getting-started/install | grep 'href="/help/'
 
 ---
 
-## 十四、按页面类型写静态信息
+## 十五、按页面类型写静态信息
 
 首页那段 `<head>` 只能当首页用。内页要改 title、description、canonical、og:url、JSON-LD。
 
@@ -803,15 +1078,18 @@ Organization 用稳定 `@id`：`https://example.com/#organization`。内页用�
 
 ---
 
-## 十五、不要做的事
+## 十六、不要做的事
 
 - 不为每条 RSS / 转载做本站文章页；Blog 日更必须带本站数据或本站步骤
 - 图表只画在 Canvas / 客户端 chart 里，源码里没有数字
 - 三篇 Blog 共用一个 HTML 骨架，只换标题
+- `/blog/` 只做无限滚动，没有能直接打开的分页 URL
+- 分页页 canonical 全部指回 `/blog/`
 - Help sidebar 靠 JS 点击后才插入链接
 - Help 做成 iframe、纯 SPA、或「搜索框 + 无链接结果」的知识库
 - `/help/faq` 一页塞几十问，不给高频问题独立 URL
-- 没有独立内容，就不新建 Docusaurus / VitePress Help
+- 没有独立内容，就不新建 Docusaurus / VitePress / Starlight Help
+- 营销页、Blog、Help 用整页水合的 React 框架，纯文字页也下发几百 KB JS
 - 不写 `meta keywords`，不编评分
 - 只有一种语言，就不做 `hreflang`
 - 不把 FAQ 硬塞进不该回答问题的页面
@@ -820,8 +1098,14 @@ Organization 用稳定 `@id`：`https://example.com/#organization`。内页用�
 
 ---
 
-## 十六、落地清单
+## 十七、落地清单
 
+
+### 框架与速度
+
+- [ ] 营销页、Blog、Help 用 Astro 静态生成；登录后的 App 单独部署并 `noindex`
+- [ ] 内容页 `curl` 下来几乎没有 `<script>`，交互组件用 `client:idle` / `client:visible`
+- [ ] PageSpeed Insights 移动端：LCP < 2.5s，INP < 200ms，CLS < 0.1
 
 ### 站点根文件
 
@@ -842,6 +1126,10 @@ Organization 用稳定 `@id`：`https://example.com/#organization`。内页用�
 
 ### Blog
 
+- [ ] `/blog/` 是倒序 feed 流，卡片标题是 `<a href>`，只放摘要不放全文
+- [ ] feed 有分页 URL（`/blog/2`），每页有上一页 / 下一页 `<a href>`，canonical 指向自己
+- [ ] 分类是独立路径（`/blog/type/data/`），不是 query 或前端 Tab
+- [ ] feed 流和 RSS 同一份数据、同一个排序；每页 `<head>` 有 RSS `alternate`
 - [ ] `/blog/{slug}` 一篇一个 URL，`og:type=article`
 - [ ] 每天固定 3 篇则 3 个新 URL，当天进 `sitemap-blog.xml` 和 RSS
 - [ ] 有数据的篇：图在 HTML 里（SVG 或 `<img>`），旁边有表或可读数字
@@ -892,6 +1180,8 @@ Organization 用稳定 `@id`：`https://example.com/#organization`。内页用�
 - [Intro to structured data](https://developers.google.com/search/docs/appearance/structured-data/intro-structured-data)
 - [Organization](https://developers.google.com/search/docs/appearance/structured-data/organization)
 - [Software app](https://developers.google.com/search/docs/appearance/structured-data/software-app)
+- [Pagination and incremental page loading](https://developers.google.com/search/docs/specialty/ecommerce/pagination-and-incremental-page-loading)（无限滚动要有分页 URL）
+- [Core Web Vitals](https://developers.google.com/search/docs/appearance/core-web-vitals)
 - [Documentation updates](https://developers.google.com/search/updates)（含 FAQ 富结果下线）
 - [AI features and your website](https://developers.google.com/search/docs/appearance/ai-features)
 - [Succeeding in AI search](https://developers.google.com/search/blog/2025/05/succeeding-in-ai-search)
@@ -903,6 +1193,15 @@ Organization 用稳定 `@id`：`https://example.com/#organization`。内页用�
 - [X Cards markup](https://developer.x.com/en/docs/x-for-websites/cards/overview/markup)
 - [The /llms.txt file, v2](https://llmstxt.org/)
 - [Ahrefs: llms.txt study](https://ahrefs.com/blog/llmstxt-study/)
+
+### Astro
+
+- [Why Astro](https://docs.astro.build/en/concepts/why-astro/)
+- [Islands architecture](https://docs.astro.build/en/concepts/islands/)
+- [Pagination](https://docs.astro.build/en/guides/routing/#pagination)
+- [Add an RSS feed](https://docs.astro.build/en/recipes/rss/)
+- [Starlight](https://starlight.astro.build/)
+- [Next.js static exports](https://nextjs.org/docs/app/guides/static-exports)（含静态导出不支持的功能）
 
 ### 可以对照的站点
 
