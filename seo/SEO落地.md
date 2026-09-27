@@ -1,55 +1,46 @@
 # SEO 落地
 
-搜索引擎和 AI 抓的是 HTML：能不能发现页面、读懂页面、把页面当成独立文档收录。
+搜索引擎和 AI 读的都是 HTML。它们得能找到你的页面，看懂它，再把它当成一篇单独的文档收进去。
 
-要做的是：
+这篇按我们在 craftsail.com 上做过的顺序写：先想清楚哪些页要被收录，把每页的 `<head>` 写对，根目录放好 `robots.txt`、`sitemap.xml`、`llms.txt`，站内所有入口都用真的 `<a href>`。后面再讲框架为什么选 Astro，以及 Blog 和 Help 这两块具体怎么搭。
 
-1. 先决定哪些页值得收录
-2. 每个可收录页的静态信息写对
-3. 根目录放好 `robots.txt`、`sitemap.xml`、`llms.txt`
-4. 可点击入口都是真实的 `<a href>`，指向独立 URL
-5. 营销页、Blog、Help 用 Astro 静态吐 HTML：Blog 做成带分页的 feed 流，Help 带整树 sidebar
-
-文中 HTML 来自 [craftsail.com](https://craftsail.com)，方便你对照线上源码。方法对产品站、文档站同样成立。
+文中的 HTML 都能在 [craftsail.com](https://craftsail.com) 上「查看网页源代码」对上。产品站、文档站都适用。
 
 ---
 
-## 一、先决定哪些页该被收录
+## 一、哪些页该被收录
 
-有本站自己的内容，就给独立 URL。没有，就链到别处，不要做薄页。
+本站有自己的内容，就给它一个独立 URL；没有，就链到原文，别做薄页。
 
-产品站通常要收录：这是什么、多少钱、怎么装、怎么用。另外两块要单独做：
+产品站一般要收录四类页：这是什么、多少钱、怎么装、怎么用。Blog 和 Help 要另外单独做。Blog 隔三差五给搜索引擎一批新页面，让它养成回来抓的习惯；Help 讲清楚用法，左边 sidebar 上挂满真实链接，爬虫进任何一篇，都能顺着摸到整棵文档树。
 
-- **Blog**：持续给搜索引擎新文档，让它回来抓。`/blog/` 做成按时间倒序的 feed 流
-- **Help**：给人查用法，sidebar 上堆真实 `<a href>`，让爬虫一次发现整棵文档树
-
-聚合资讯、采集别人的文章，本身不是标准答案。别人已经写过的内容，不要再做一版「本站转载页」去抢收录。英文世界对采集站更敏感。
+聚合资讯、采集来的文章不算自己的内容。别人写过的东西，再做一份「本站转载页」去抢收录，基本是白费力气，英文搜索对采集站尤其不客气。
 
 | 页面类型 | 产品站 | 聚合 / 数据门户 | 做法 |
 | --- | --- | --- | --- |
 | 首页 | 品牌 + 品类 | 品牌 + 品类 | 独立 title；Organization / WebSite |
-| 定价 | `/pricing` | 通常没有 | 价格写在正文，JSON-LD 和可见内容一致 |
-| Blog | `/blog/` feed 流 + `/blog/{slug}`，每天固定发 | 只有本站数据和观点才发 | 列表倒序分页；文章带图表 + 可区分的结构；转载不算 |
-| Help | `/help/{path}` + sidebar | `/about/`、来源说明、隐私 | 一篇一个 URL；sidebar 源码里就要有整树 href |
-| App | `/app/`、`/account/`、`/api/` | 同左 | `noindex`，写入 `robots.txt` |
+| 定价 | `/pricing` | 通常没有 | 价格写在正文，JSON-LD 和页面上一致 |
+| Blog | `/blog/` feed 流 + `/blog/{slug}`，每天固定发 | 只有本站数据和观点才发 | 列表倒序分页；文章带图表，结构按类型区分；转载不算 |
+| Help | `/help/{path}` + sidebar | `/about/`、来源说明、隐私 | 一篇一个 URL；sidebar 的整棵树都在源码里 |
+| App | `/app/`、`/account/`、`/api/` | 同左 | `noindex`，写进 `robots.txt` |
 | 导航 | 侧栏、页脚、面包屑 | 筛选控件也要是链接 | 全部 `<a href>` |
 
-把别人的 Pricing、Help、Blog 结构原样搬到自己站上，如果对应内容不存在，会做出一批空壳页。
+照抄别人的 Pricing、Help、Blog 结构也有坑：自己没有对应的内容，抄过来就是一批空壳页。
 
 ---
 
-## 二、`<head>` 在干什么
+## 二、`<head>` 写给谁看
 
-`<head>` 同时给几类读取者看：
+`<head>` 的读者不止一个：
 
-| 读取者 | 它看什么 | 你要给什么 |
+| 读者 | 它看什么 | 你要准备什么 |
 | --- | --- | --- |
-| 浏览器 / 手机系统 | 图标、主题色、字体 | favicon、apple-touch-icon、theme-color、font preload |
-| Google / Bing | title、description、canonical、robots、正文、链接 | 可收录的独立 URL + 准确摘要 |
-| 社交平台 | Open Graph、Twitter Card | 标题、描述、1200×630 图 |
-| 搜索和 AI | JSON-LD、FAQ、清晰标题结构 | 实体、产品或目录、问答 |
+| 浏览器 / 手机系统 | 图标、主题色、字体 | favicon、apple-touch-icon、theme-color、字体 preload |
+| Google / Bing | title、description、canonical、robots、正文、链接 | 可收录的独立 URL 和准确的摘要 |
+| 社交平台 | Open Graph、Twitter Card | 标题、描述、1200×630 的图 |
+| 搜索和 AI | JSON-LD、FAQ、标题层级 | 实体、产品或目录、问答 |
 
-下面这份是 craftsail.com 首页源码，用来对照各层怎么写。用无痕窗口打开，「查看网页源代码」，就能对上。
+下面是 craftsail.com 首页的 `<head>`。开无痕窗口，右键「查看网页源代码」就能对上。
 
 ```html
 <meta charset="UTF-8" />
@@ -78,7 +69,7 @@
 <meta name="twitter:card" content="summary_large_image" />
 ```
 
-下面按层拆。
+后面几节一块一块拆开讲。
 
 ---
 
@@ -93,18 +84,17 @@
 <meta name="apple-mobile-web-app-title" content="造物局" />
 ```
 
-- **浅色 / 深色两套 favicon**：用 `media="(prefers-color-scheme: ...)"` 切换。深色浏览器标签栏上，浅色 SVG 会看不见。
-- **`?v=2` 是缓存破坏**：换图标时改版本号，否则用户和部分爬虫会一直拿旧图。
-- **`apple-touch-icon` 用 180×180 PNG**：iOS 加到主屏幕用。不要透明底（iOS 会填成黑），不要自己做圆角。
-- **`theme-color`、`application-name` 不管排名**：它们管浏览器 UI 和「添加到主屏幕」时的名字。
+favicon 准备浅色、深色两套，用 `media="(prefers-color-scheme: ...)"` 切换。只放一套的话，深色模式的标签栏上，浅色 SVG 直接看不见。
 
-检查：
+后面的 `?v=2` 是给缓存用的。换了图标记得改版本号，不然用户的浏览器和一部分爬虫会一直拿旧图。
 
-- HTML 里写到的图标文件都要真实存在，返回 `200`
-- 文件名和路径必须一致
-- 需要的话再补 `/favicon.ico`，给老浏览器和部分抓取工具兜底
+`apple-touch-icon` 用 180×180 的 PNG，iOS 添加到主屏幕时用它。底色别透明，iOS 会给你填成黑的；也别自己切圆角，系统会切。
 
-这层做错，搜索结果小图标、分享卡片、主屏幕图标会一起错。它不决定排名，但海外用户会先看标签栏图标和分享卡片，再决定点不点。
+`theme-color` 和 `application-name` 跟排名没关系，只影响浏览器 UI 和添加到主屏幕后显示的名字。
+
+上线前检查一遍：HTML 里写到的每个图标文件都要能打开、返回 `200`，路径和文件名一个字母都不能差。想照顾老浏览器和一些抓取工具，就再补一个 `/favicon.ico`。
+
+这一块不影响排名，但一旦出错，搜索结果的小图标、分享卡片、主屏幕图标会一起坏。海外用户是先看到这些，才决定点不点的。
 
 ---
 
@@ -114,16 +104,17 @@
 <link rel="preload" href="/_astro/manrope-latin-wght-normal.DHIcAJRg.woff2" as="font" type="font/woff2" crossorigin />
 ```
 
-- 只 preload **首屏真正用到的字重**。不要把 400/500/600/700 全 preload，会抢带宽。
-- `as="font"` 和 `crossorigin` 必须写。字体请求默认是匿名 CORS，漏了 `crossorigin`，preload 会失效并重复下载。
-- 用 `woff2`，不要 preload `ttf` / `otf`。
-- 构建产物带哈希时，换字体文件路径自己变，不必再手改 `?v=`。上面这行是 Astro 打出来的文件名。
+只 preload 首屏真正用到的那一个字重。400、500、600、700 全列上，它们会和首屏的其他资源抢带宽。
 
-Google 把页面体验（Core Web Vitals）算进排序。字体 preload 能减少首屏文字闪烁（FOUT/FOIT），对 LCP / CLS 有帮助。只 preload 一两套展示字体，正文尽量走系统字体栈。
+`as="font"` 和 `crossorigin` 两个属性都得写。字体请求默认走匿名 CORS，少了 `crossorigin`，preload 下来的文件用不上，浏览器还会再下一遍。格式只用 `woff2`，别 preload `ttf`、`otf`。
+
+路径里那串哈希是 Astro 构建时生成的，换了字体文件，文件名会跟着变，不用手动加 `?v=`。
+
+Core Web Vitals 是 Google 的排序因素之一。preload 能减少首屏文字闪一下的情况（FOUT / FOIT），LCP 和 CLS 都会好一些。我们只 preload 一套标题字体，正文直接用系统字体。
 
 ---
 
-## 五、title、description、canonical、robots
+## 五、title、description、robots、canonical
 
 ```html
 <title>造物局 · CraftSail — AI 与开发者趋势数据门户</title>
@@ -132,13 +123,15 @@ Google 把页面体验（Core Web Vitals）算进排序。字体 preload 能减�
 <link rel="canonical" href="https://craftsail.com/" />
 ```
 
-### 1. Title
+### 1. title
+
+格式：
 
 ```text
 [产品名] · [主关键词 / 核心价值]
 ```
 
-首页用品类句，内页把这一页的主题放前面、品牌放后面：
+首页写品类，内页把这一页讲的事放前面，品牌放后面：
 
 ```text
 Acme — invoice API for SaaS
@@ -146,10 +139,7 @@ Pricing — Acme
 Install the Acme CLI — Acme
 ```
 
-- 每个 URL 必须有自己的 title，禁止全站同一句
-- 大约 50–60 个英文字符，或中文 20–30 字，避免搜索结果被截断
-- 主关键词靠前，品牌名可以放后面
-- 首页讲品类，内页讲这一页的具体问题
+每个 URL 的 title 都要不一样，全站用同一句是最常见的错。长度控制在英文 50–60 个字符、中文 20–30 个字，再长会被搜索结果截断。
 
 | 页面 | 差的 title | 好的 title |
 | --- | --- | --- |
@@ -157,28 +147,23 @@ Install the Acme CLI — Acme
 | 定价 | Pricing | Pricing — Acme |
 | 文档 | Docs | Install the Acme CLI — Acme |
 | 关于 | About | About Acme |
-| 分类 / 主题 | News | AI news — Acme（如果这一页真是这个主题） |
+| 分类 / 主题 | News | AI news — Acme（前提是这一页确实只讲这个） |
 
-Google 经常改写 title。写得越贴近页面真实 H1 和正文，被改写的概率越低。
+Google 经常改写 title。你写的越接近页面上的 H1 和正文，被改的可能越小。
 
-### 2. Description
+### 2. description
 
-Google 明确说过：meta description **不直接参与排名**，但会影响搜索结果摘要和点击率。写不好，Google 会自己从正文抽一段。
+Google 说过 meta description 不直接影响排名。但搜索结果标题下面那两行摘要常常取自它，用户点不点就看这两行。写得不好，Google 会自己从正文里挑一段。
 
-- 每页独一无二
-- 英文大约 140–160 字符，中文大约 70–90 字
-- 先说这一页是什么，再说和别人的差别
-- 必须和页面可见正文一致，不要写页面上没有的承诺
+每页写一句自己的，英文 140–160 字符，中文 70–90 字。先说这页是什么，再说跟别人哪里不一样。页面上没有的东西，不要写进去。
 
-分类页、工具页尤其要写清边界。例如「近 24 小时公开资讯，标题链到原文，不是官方热搜」——时间窗、来源、点击去哪、它不是什么，都写进去。
+分类页和工具页要把边界写清楚。比如「近 24 小时公开资讯，标题链到原文，不是官方热搜」，时间范围、来源、点了去哪、它不是什么，一句都交代了。
 
-### 3. Keywords 不用做
+### 3. 不用写 keywords
 
-不要写 `meta keywords`。
+`meta keywords` 不用写。Google 2009 年起就不拿它排名了，官方文档到现在还把它列为 unsupported，Bing 也基本不看。
 
-Google 从 2009 年起就不用它做排名，官方文档至今把它列为 **unsupported**。Bing 基本也不靠它。
-
-它顶多给你自己看「这页想打哪些词」。真正该做的是 title / H1 / 正文里出现这些词，用独立 URL 覆盖对应问题，再用内部链接把这些页面连起来。不要为了 keywords 堆同义词。
+想覆盖哪些词，就让这些词出现在 title、H1 和正文里，每个问题给一个独立 URL，再用站内链接把这些页串起来。
 
 ### 4. robots meta
 
@@ -189,35 +174,31 @@ Google 从 2009 年起就不用它做排名，官方文档至今把它列为 **u
 | 指令 | 含义 |
 | --- | --- |
 | `index` | 允许收录这一页 |
-| `follow` | 允许跟踪这一页上的链接 |
+| `follow` | 允许顺着这一页的链接继续抓 |
 | `max-image-preview:large` | 允许搜索结果用大图预览 |
-| `max-snippet:-1` | 不限制文字摘要长度 |
-| `max-video-preview:-1` | 不限制视频预览时长 |
+| `max-snippet:-1` | 摘要长度不限 |
+| `max-video-preview:-1` | 视频预览时长不限 |
 
-公开页可以这么写。这些页不行：
+公开页照这样写就行。下面几类要改：
 
 - 登录后的 app：`noindex, nofollow`
-- 预发环境、staging：整站 `noindex`，并且不要放进 sitemap
-- 感谢页、筛选参数页、打印页：通常 `noindex`
-- 不存在的路径：HTTP `404`，并且带 `noindex`
+- 预发环境、staging：整站 `noindex`，也不要放进 sitemap
+- 感谢页、筛选参数页、打印页：一般 `noindex`
+- 不存在的路径：返回 HTTP `404`，带 `noindex`
 
-`robots.txt` 管「能不能抓」，meta robots 管「抓了能不能进索引」。想从搜索结果里拿掉一页，用 `noindex`，不要只靠 `Disallow`。
+`robots.txt` 管的是能不能抓，meta robots 管的是抓到以后能不能进索引。想把一页从搜索结果里拿掉，要用 `noindex`，光写 `Disallow` 不够。
 
-### 5. Canonical
+### 5. canonical
 
 ```html
 <link rel="canonical" href="https://example.com/pricing" />
 ```
 
-- 用绝对 HTTPS 地址
-- 每个可收录页都放 **指向自己的 canonical**
-- `www` / 非 `www`、带不带尾斜杠、`http` / `https` 只能留一种，其余 301/308 到 canonical
-- UTM、ref、语言参数页，canonical 指回干净 URL
-- 不要把 canonical 指到带 `#` 的地址
+canonical 用绝对 HTTPS 地址，每个可收录页都指向自己。`www` 和不带 `www`、有没有尾斜杠、`http` 和 `https`，各选定一种，其余全部 301/308 过来。带 UTM、ref、语言参数的地址，canonical 指回干净的 URL。canonical 里不要出现 `#`。
 
-筛选如果只是同一份文档的时间窗、排序（例如 `?range=7d`），不要单独做 canonical。筛选如果已经构成一篇新文档（例如「AI 资讯」和「全部资讯」），应该是独立路径，而不是 query。
+筛选分两种情况。只是同一份内容换个时间窗或排序（比如 `?range=7d`），不用单独给 canonical。筛出来已经是另一份内容了（比如「AI 资讯」和「全部资讯」），那它就该有自己的路径，而不是挂在 query 上。
 
-不要这样写：
+常见的错误写法：
 
 ```html
 <link rel="canonical" href="https://example.com/#/pricing" />
@@ -225,13 +206,13 @@ Google 从 2009 年起就不用它做排名，官方文档至今把它列为 **u
 <link rel="canonical" href="http://example.com/pricing?utm_source=twitter" />
 ```
 
-要这样写：
+正确写法：
 
 ```html
 <link rel="canonical" href="https://example.com/pricing" />
 ```
 
-旧 query 迁到干净路径时，用 308：
+旧的 query 地址迁到新路径，用 308：
 
 ```text
 /news/?category=ai   308 →  /news/ai/
@@ -255,40 +236,41 @@ Google 从 2009 年起就不用它做排名，官方文档至今把它列为 **u
 <meta name="twitter:card" content="summary_large_image" />
 ```
 
-- **OG 图固定 1200×630 PNG/JPG**。Facebook、LinkedIn、Slack、iMessage、X 通用这个尺寸。
-- **每页最好有自己的图**，至少首页、核心功能页、每篇长文不要共用一张无字海报。全站共用一张 `og.png` 是还没做完，不是范本。
-- `og:url` 必须和 canonical 一致。
-- 文章页用 `og:type=article`，并补 `article:published_time`。
-- Twitter/X 会回退到 OG，但显式写 `twitter:card=summary_large_image` 更稳。
-- **有官方 X 账号再写 `twitter:site`。** 填一个 404 账号比不填更糟。
+OG 图统一用 1200×630 的 PNG 或 JPG，Facebook、LinkedIn、Slack、iMessage、X 都认这个尺寸。
 
-验证：
+最好每页一张图，至少首页、核心功能页和每篇长文，别共用一张没字的海报。craftsail.com 现在全站共用一张 `og.png`，这是还没做完，不要照抄。
+
+`og:url` 要和 canonical 一致。文章页的 `og:type` 写 `article`，再补上 `article:published_time`。
+
+X 找不到 twitter 标签时会退回去读 OG，但显式写上 `twitter:card=summary_large_image` 更稳。`twitter:site` 等有了官方账号再写，填一个打不开的账号，还不如空着。
+
+写完用这几个工具检查：
 
 - [Facebook Sharing Debugger](https://developers.facebook.com/tools/debug/)
 - [LinkedIn Post Inspector](https://www.linkedin.com/post-inspector/)
 - X Card Validator
 
-改图之后这些工具都要重新 scrape，否则会一直显示缓存。
+改过图以后，要在工具里重新抓一次，不然看到的一直是旧缓存。
 
-海外用户大量从 Slack、X、LinkedIn、邮件转发进来。卡片图和标题不对，点击就没了。
+海外流量很多是从 Slack、X、LinkedIn 和邮件转发过来的。卡片上的图和标题不对，别人就不点了。
 
 ---
 
 ## 七、JSON-LD
 
-用 Google 推荐的写法：一个 `<script type="application/ld+json">`，里面用 `@graph` 把多个实体串起来。
+按 Google 推荐的写法，一页放一个 `<script type="application/ld+json">`，用 `@graph` 把几个实体装在一起。
 
-产品站常见：
+产品站常用这几种：
 
-| 类型 | 作用 | 放哪 |
+| 类型 | 作用 | 放在哪 |
 | --- | --- | --- |
 | `Organization` | 站点是谁、logo、社交账号 | 每个可收录页都可以引用 |
-| `WebSite` | 站点名、语言 | 首页，内页用 `@id` 引用 |
-| `SoftwareApplication` | 产品、价格 | 首页或产品页；价格必须和定价页可见内容一致 |
-| `FAQPage` | 问答 | 页面上真能看到这些问题的那一页 |
-| `WebApplication` | 浏览器里用的工具 | 工具页；免费就写 `"0"` |
+| `WebSite` | 站点名、语言 | 首页；内页用 `@id` 引用 |
+| `SoftwareApplication` | 产品、价格 | 首页或产品页；价格要和定价页上写的一致 |
+| `FAQPage` | 问答 | 页面上确实能看到这些问答的那一页 |
+| `WebApplication` | 在浏览器里用的工具 | 工具页；免费就写 `"0"` |
 
-聚合 / 目录站把 `SoftwareApplication` 换成 `DataCatalog` / `CollectionPage`。不要给门户本身报一个软件价格。
+聚合站、目录站把 `SoftwareApplication` 换成 `DataCatalog` 或 `CollectionPage`，别给一个门户标软件价格。
 
 ### 1. 用 `@id` 把实体连起来
 
@@ -303,13 +285,13 @@ Google 从 2009 年起就不用它做排名，官方文档至今把它列为 **u
 }
 ```
 
-其他对象用 `"publisher": { "@id": "https://example.com/#organization" }` 引用，不要把站点信息在每个页面复制一遍。
+别的地方要用站点信息，写 `"publisher": { "@id": "https://example.com/#organization" }` 引用就行，不用每页复制一份。
 
-`sameAs` 只填能打开的账号。没有 X、没有 LinkedIn，就不写。
+`sameAs` 只放打得开的账号，没有 X、没有 LinkedIn 就别写。
 
-### 2. ItemList 不要指向本站薄页
+### 2. ItemList 指向原文
 
-如果你在聚合别人的内容，列表里的 `url` 应该是原文：
+聚合别人的内容时，列表里每条的 `url` 填原文地址：
 
 ```json
 {
@@ -320,47 +302,44 @@ Google 从 2009 年起就不用它做排名，官方文档至今把它列为 **u
 }
 ```
 
-不要做成 `https://example.com/news/某个id/`。
+而不是 `https://example.com/news/某个id/`。
 
-聚合站常见做法是：每条 RSS 做一个本站文章页。结果是大量和原文重复的薄页，canonical 还说不清楚，Google 会当成采集站。本站该收录的是主题页、来源目录、自己写的评测和文档。
+很多聚合站给每条 RSS 都生成一个本站文章页，结果是一大堆和原文重复的薄页，canonical 也说不清该指向谁，Google 很容易把整站判成采集站。聚合站真正该被收录的，是主题页、来源目录，以及自己写的评测和文档。
 
 ### 3. FAQPage
 
-- Google 从 2023 年起就把 FAQ 富结果限制在少数权威站点
-- 2026 年 5 月起，FAQ 富结果不再在 Google 搜索里展示
-- **FAQPage 这个 schema 类型本身没有被废**。用了但不产生富结果，不会因此扣分
-- 对 Bing、对 AI 抓取、对「把问答抽成标准答案」，FAQ 标记仍然值得留
+FAQ 这几年变化不小。Google 从 2023 年起只给少数权威站点展示 FAQ 富结果，2026 年 5 月起干脆不在搜索结果里展示了。但 FAQPage 这个 schema 类型没有废，写了不出富结果，也不会扣分。Bing 和 AI 抓取还会读它，拿来把问答抽成现成的答案，所以我们一直留着。
 
-前提：**页面上必须真的看得到这些问题和答案。** 不要只在 JSON-LD 里写 FAQ，正文没有。那属于误导性标记。
+前提是这些问答在页面上看得见。只在 JSON-LD 里写、正文里没有，属于误导性标记。
 
-FAQ 放在用户会来找答案的那一页。产品站可以放首页或 `/help/`。数据门户的首页如果是数据和入口，FAQ 放到 `/about/`，不要塞进首屏。
+FAQ 放在用户会来找答案的页面。产品站放首页或 `/help/` 都行。数据门户的首页如果主要是数据和入口，就把 FAQ 放到 `/about/`，别挤在首屏。
 
-JSON-LD 里的问题和页面上的标题必须是同一份文案。问题用用户会搜的原话。答案开头先给结论，再补细节。例如：
+JSON-LD 里的问题和页面上的标题要一字不差。问题用用户搜索时的原话，答案第一句先给结论，细节放后面。比如：
 
 1. 这是什么？
 2. 怎么安装？
 3. 多少钱？
-4. 数据从哪来？（如果你做的是数据产品）
+4. 数据从哪来？（做数据产品的话）
 
-### 4. 硬规则
+### 4. 几条硬规则
 
-- 写在初始 HTML 里，不要等 JavaScript 执行完再插入。社交爬虫和不少 AI 爬虫不跑 JS
-- 标记必须和可见内容一致
+- JSON-LD 写在初始 HTML 里，别等 JS 执行完再插。社交平台的爬虫和不少 AI 爬虫根本不跑 JS
+- 标记的内容要和页面上看得到的一致
 - 用 [Rich Results Test](https://search.google.com/test/rich-results) 和 [Schema Markup Validator](https://validator.schema.org/) 检查
-- 内页不要复制整份首页 `@graph`。分类页用 `CollectionPage` + 面包屑，文档页用 `TechArticle` 或 `FAQPage`，工具页用 `WebApplication`
-- 没有真实评价，就不写 `aggregateRating`。编评分是明确违规
+- 内页别复制首页的整份 `@graph`。分类页用 `CollectionPage` 加面包屑，文档页用 `TechArticle` 或 `FAQPage`，工具页用 `WebApplication`
+- 没有真实评价就别写 `aggregateRating`，编评分是明确违规
 
 ---
 
 ## 八、robots.txt、sitemap.xml、llms.txt
 
-`<head>` 解决「这一页怎么被理解」。这三个文件解决「整站怎么被发现」。
+`<head>` 管的是一页怎么被理解，这三个文件管的是整站怎么被发现。
 
-用户口头上常说 `llm.txt`。业界约定文件名是 **`llms.txt`**（两个 s），规范在 [llmstxt.org](https://llmstxt.org/)。只放 `/llm.txt`，主流 agent 不会按约定去读。
+顺便说一个常见的叫错：很多人说 `llm.txt`，约定的文件名其实是 `llms.txt`，多一个 s，规范在 [llmstxt.org](https://llmstxt.org/)。只放一个 `/llm.txt`，agent 不会去读。
 
 ### 1. robots.txt
 
-位置只能是站点根：`https://example.com/robots.txt`。
+只能放在站点根目录：`https://example.com/robots.txt`。
 
 ```txt
 User-agent: *
@@ -373,22 +352,24 @@ Disallow: /api/
 Sitemap: https://example.com/sitemap-index.xml
 ```
 
-- `robots.txt` **不能阻止收录**，只能阻止抓取。不想进索引，用 `noindex`
-- 不要 `Disallow: /_astro/`、`/_next/` 或挡住 JS/CSS，Google 需要它们渲染页面
-- `Sitemap:` 行用绝对 URL
-- 文件放根路径，UTF-8，不要做成 HTML 错误页
-- AI 爬虫如果要单独策略，按 user-agent 分组写。默认开放对 GEO 更有利
-- **`Sitemap:` 里列出的文件必须能打开。** 模块还没就绪就写上 `sitemap-projects.xml`，文件 404，比少写一行更糟
+几个容易踩的地方：
 
-有的站点把整站 `Disallow: /`，Google 完全不抓，再漂亮的 title 也没用。
+- `robots.txt` 只能挡抓取，挡不了收录。不想进索引，用 `noindex`
+- 别 `Disallow` 掉 `/_astro/`、`/_next/` 这类放 JS、CSS 的目录，Google 渲染页面要用
+- `Sitemap:` 写绝对 URL
+- 文件是 UTF-8 纯文本，别让它返回一个 HTML 错误页
+- 想给 AI 爬虫单独定规则，按 user-agent 分组写。我们默认全开放，对 GEO 更有利
+- `Sitemap:` 里写的文件必须打得开。模块还没上线就先写上 `sitemap-projects.xml`，结果 404，还不如不写
+
+见过有的站整站 `Disallow: /`，Google 一页都不抓，title 写得再好也没用。
 
 对照：<https://craftsail.com/robots.txt>
 
 ### 2. sitemap.xml
 
-把希望被收录的 URL 清单交给搜索引擎。它不保证收录，但能加快发现，尤其是新站、文档深、外链少的站点。
+sitemap 是交给搜索引擎的一份 URL 清单。它不保证收录，但能让新页被发现得快一些，新站、文档层级深、外链少的站效果更明显。
 
-大站用 sitemap index，再拆成多个 sitemap 文件。Help 稳定、量小，可以和营销页放一起。Blog 日更、量大，单独一个 `sitemap-blog.xml`，`lastmod` 用文章真实发布时间。
+站大了就用 sitemap index，下面拆成几个文件。Help 更新少、数量不多，可以和营销页放在一起。Blog 天天更新、数量涨得快，单独放 `sitemap-blog.xml`，`lastmod` 填文章的真实发布时间。
 
 ```text
 https://example.com/
@@ -399,36 +380,31 @@ https://example.com/blog/2026-09-19-signups
 https://example.com/about
 ```
 
-不要放 App、登录墙、带 `?category=` 的筛选页、会随快照消失的 ID。Blog 每发一篇就进 sitemap，不要等周更。
+App、登录页、带 `?category=` 的筛选页、随快照变化的 ID，都不要放。Blog 发一篇就加一篇，别攒到周末。
 
-Google 现行文档：
+Google 文档里的要求：
 
-- 只放 **canonical、可收录、返回 200** 的 URL
-- 不要放 `noindex`、重定向、404、登录墙、带 `#` 的地址
+- 只放 canonical、可收录、返回 200 的 URL
+- 不放 `noindex`、重定向、404、登录墙、带 `#` 的地址
 - 用绝对 HTTPS URL
-- 单文件上限 50,000 条或 50MB（未压缩）
-- `lastmod` 只有在真实准确时才写；没有就不写
-- `<priority>` 和 `<changefreq>` Google 会忽略，不必花时间调
-- 提交方式：`robots.txt` 里写 `Sitemap:`，同时在 Google Search Console 提交
+- 单个文件最多 50,000 条或 50MB（未压缩）
+- `lastmod` 确定准确才写，不确定就不写
+- `<priority>` 和 `<changefreq>` Google 不看，不用费时间调
+- 在 `robots.txt` 里写 `Sitemap:`，同时到 Google Search Console 提交
 
-会随时间增减的条目可以进 sitemap，但不要写进 `llms.txt`。目录里出现大量 404，比没有目录更糟。
+会随时间增减的条目可以进 sitemap，但别写进 `llms.txt`。目录里一堆 404，比没有目录还糟。
 
 对照：<https://craftsail.com/sitemap-index.xml>
 
 ### 3. llms.txt
 
-`llms.txt` 是 2024 年由 Jeremy Howard / Answer.AI 提出的约定，2026 年 8 月更新到 v2。它是一份 Markdown 目录，告诉 agent：这个站点是什么、先读哪些页。
+`llms.txt` 是 Jeremy Howard 和 Answer.AI 在 2024 年提出的约定，2026 年 8 月出了 v2。它是一份 Markdown 格式的目录，告诉 agent 这个站是干什么的、先看哪几页。
 
-它 **不是** W3C 标准，也 **没有拦截能力**。Google 明确说过：Search、AI Overviews、AI Mode **不会用** `llms.txt` 做排名。Ahrefs 2026 年对 13.7 万个域名的统计里，28% 的站点有这个文件，但 97% 从未被请求；真去读的，更多是编程 agent 和审计工具，不是 ChatGPT / Perplexity 的回答引擎。
+它不是 W3C 标准，也拦不住任何人。Google 明确说过，Search、AI Overviews 和 AI Mode 都不用它排名。Ahrefs 2026 年统计了 13.7 万个域名，28% 放了这个文件，其中 97% 从来没被请求过。会来读它的主要是编程 agent 和审计工具，ChatGPT、Perplexity 这类回答引擎用得不多。
 
-所以：
+所以它对 Google SEO 几乎没用，对 Cursor、Claude Code、文档问答和自己搭的 agent 有用。做一个花不了多少时间，但它替代不了 robots.txt、sitemap 和正经的 HTML。
 
-- 对 Google SEO：几乎无直接作用
-- 对 Cursor、Claude Code、文档问答、自定义 agent：有用
-- 成本很低，值得做
-- 不能代替 `robots.txt`、sitemap 和正经 HTML
-
-结构大致是：H1 站点名、一段说明、`Start here` 列稳定入口、后面按主题分组，最后 `Optional`。
+结构一般是：H1 写站名，接一段简介，`Start here` 列最稳定的入口，中间按主题分组，最后是 `Optional`。
 
 ```md
 # Acme
@@ -446,23 +422,21 @@ Google 现行文档：
 - [Privacy](https://example.com/privacy)
 ```
 
-只列稳定 URL。不列会消失的 ID。链接必须是真实可打开的地址，不要链到 hash 路由。不要把 `Disallow` 写进 `llms.txt`，它没有 robots 语义。
+只列稳定的 URL，会消失的 ID 不要列。每个链接都要打得开，不能是 hash 路由。`Disallow` 也别往这里写，这个文件没有 robots 的效力。
 
-没有独立文档页，目录里列再多链接也没用。文档站还可以同时提供每页的 Markdown 版。做到目录这一层，没有 `llms-full.txt`，也够用。
+站上本来就没有独立文档页的话，这里列再多链接也没意义。文档站可以顺便给每页提供一个 Markdown 版本。做到目录这一步就够了，`llms-full.txt` 不是必须的。
 
-Stripe Docs、Anthropic、Cloudflare、Mintlify 托管的文档站已经在用。对照：<https://craftsail.com/llms.txt>
+Stripe Docs、Anthropic、Cloudflare，还有 Mintlify 托管的文档站都在用。对照：<https://craftsail.com/llms.txt>
 
 ---
 
-## 九、点击必须是 `<a href>`
+## 九、所有入口都用 `<a href>`
 
-搜索引擎发现新页的主路径，是跟踪 HTML 里的 `<a href="真实地址">`。
+搜索引擎发现新页面，主要靠顺着 HTML 里的 `<a href="真实地址">` 往下爬。Google 的 [JavaScript SEO](https://developers.google.com/search/docs/crawling-indexing/javascript/javascript-seo-basics) 文档说得很明白：导航用标准的 `<a href>` 指向独立 URL，别拿 `onclick` 当导航，也别拿 `#/path` 当页面地址。
 
-Google 官方 [JavaScript SEO](https://developers.google.com/search/docs/crawling-indexing/javascript/javascript-seo-basics) 写得很直接：用标准的 `<a href>` 指向独立 URL。不要用 `onclick` 当导航，也不要用 `#/path` 当页面地址。
+### 1. 爬虫不会点按钮
 
-### 1. 爬虫不会「点击」你的按钮
-
-这些写法，人能用，机器基本当没看见，或者当成当前页：
+下面这些写法，人用起来没问题，爬虫基本当它们不存在，或者以为还在当前页：
 
 ```html
 <div onclick="go('/pricing')">Pricing</div>
@@ -471,7 +445,7 @@ Google 官方 [JavaScript SEO](https://developers.google.com/search/docs/crawlin
 <div class="nav-item" data-href="/pricing">Pricing</div>
 ```
 
-筛选、Tab、看起来像按钮的入口，底层也必须是链接：
+筛选、Tab、长得像按钮的入口，底下也得是链接：
 
 ```html
 <nav>
@@ -482,13 +456,13 @@ Google 官方 [JavaScript SEO](https://developers.google.com/search/docs/crawlin
 </nav>
 ```
 
-关 JS、用 `curl` 打开那个 URL，源码里要有 title、H1、分类链接。做不到这一点，后面的 JSON-LD 都是装饰。
+检验方法：关掉 JS，或者直接 `curl` 这个 URL，看源码里有没有 title、H1 和分类链接。这一步过不了，后面 JSON-LD 写得再全也白搭。
 
-收藏、刷新、加载更多、提交表单，仍用 `<button>`。那些不是文档导航。
+收藏、刷新、加载更多、提交表单，这些还是用 `<button>`，它们本来就不是页面跳转。
 
-### 2. 前端框架也要最终渲染出 `<a href>`
+### 2. 用前端框架也一样
 
-Astro / React / Vue / Next 的 `<a>`、`<Link>`、`<router-link>` 只要最后输出真实 `href`，就是合格的。
+Astro、React、Vue、Next 里的 `<a>`、`<Link>`、`<router-link>`，只要最后渲染出来带真实的 `href`，就没问题。
 
 ```jsx
 // 可以：最终 HTML 是 <a href="/pricing">
@@ -498,9 +472,9 @@ Astro / React / Vue / Next 的 `<a>`、`<Link>`、`<router-link>` 只要最后�
 <div onClick={() => router.push('/pricing')}>Pricing</div>
 ```
 
-验收：浏览器里「查看网页源代码」（不是 Elements 面板），搜这些 `href`。如果源码里没有，说明它们是 JS 跑完才出现的。Google 也许能渲染，Bing、很多 AI 爬虫、社交爬虫往往不能。
+检查时看「查看网页源代码」，别看 DevTools 的 Elements 面板。源码里搜不到这些 `href`，说明它们是 JS 跑完才插进去的。Google 也许能渲染出来，Bing、很多 AI 爬虫和社交平台的爬虫就不一定了。
 
-### 3. 锚点 `#` 只用来跳到同一页的某一段
+### 3. `#` 只用来跳到页内某一段
 
 ```html
 <!-- 可以：同一页里跳到章节 -->
@@ -511,15 +485,19 @@ Astro / React / Vue / Next 的 `<a>`、`<Link>`、`<router-link>` 只要最后�
 <a href="/help#install">Install</a>
 ```
 
-`#` 后面的内容，搜索引擎默认当成同一 URL 的片段。`https://example.com/#/pricing` 和首页在收录上经常被看成同一页。
+搜索引擎默认把 `#` 后面的部分当成同一个 URL 里的某个位置。`https://example.com/#/pricing` 在收录上经常被当成首页。
+
+### 4. 页头和页脚
+
+页头、页脚里的链接同样要是 `<a href>`。页脚把 Blog、Help、定价都挂上，营销页之间也用真链接互相指，别全靠 JS 路由。只在首页放一个「Docs」按钮是不够的，Help 的侧栏和面包屑见第十三节。
 
 ---
 
-## 十、每个标准答案都要有独立 URL
+## 十、每个答案一个独立 URL
 
-### 1. 独立路径，不要靠 query 或 hash 冒充文档
+### 1. 用路径，不用 query 或 hash
 
-人能用的筛选，爬虫打开列表页时，源码里往往看不到分类文档：
+下面这些地址，人点着能用，但爬虫打开列表页时，源码里往往看不到对应的内容：
 
 ```text
 /help?page=install
@@ -527,7 +505,7 @@ Astro / React / Vue / Next 的 `<a>`、`<Link>`、`<router-link>` 只要最后�
 /#/pricing
 ```
 
-该改成：
+改成：
 
 ```text
 /help/install/macos
@@ -535,7 +513,7 @@ Astro / React / Vue / Next 的 `<a>`、`<Link>`、`<router-link>` 只要最后�
 /pricing
 ```
 
-旧 query 地址 308 到干净路径。带 `q`、临时筛选的页不 301，加 `noindex`，canonical 指回路径。
+旧的 query 地址 308 到新路径。带搜索词 `q` 或临时筛选的页面不用重定向，加 `noindex`，canonical 指回路径就行。
 
 | 错误 URL | 搜索引擎看到的 | 正确 URL |
 | --- | --- | --- |
@@ -544,30 +522,28 @@ Astro / React / Vue / Next 的 `<a>`、`<Link>`、`<router-link>` 只要最后�
 | `/help#install` | `/help` | `/help/getting-started/install` |
 | `/?page=pricing` | 带参数的首页 | `/pricing` |
 
-Google 早在 2015 年就废弃了 `#!` AJAX 抓取方案。Hash 路由只适合不需要收录的内部工具。
+Google 2015 年就废弃了 `#!` 那套 AJAX 抓取方案。hash 路由现在只适合不需要被搜到的内部工具。
 
-### 2. 每个内容页都要能直接打开
+### 2. 每个内容页都能直接打开
 
-- 把这个 URL 贴到无痕窗口，不点任何按钮，正文就在 HTML 里
-- 刷新、后退、从 Google 点进来，都还是这一页
-- 服务器对这篇文档返回 `200`，对不存在的文档返回真正的 `404`，不要全部回 `index.html`
+拿一个 URL 贴进无痕窗口，什么都不点，正文就应该已经在 HTML 里了。刷新、后退、从 Google 点进来，看到的都得是同一页。存在的文档返回 `200`，不存在的返回真正的 `404`，别什么路径都回一个 `index.html`。
 
-SPA 常见的 soft 404 是：随便输入一个地址，HTTP 仍是 200，页面上用 JS 写「Not found」。搜索引擎会把大量空页收进去，浪费抓取配额。不存在的路径应返回 HTTP 404，并带 `x-robots-tag: noindex`。
+SPA 常见的 soft 404 就是这么来的：随便输一个地址，状态码还是 200，页面上靠 JS 显示「Not found」。搜索引擎会把这些空页也收进去，白白浪费抓取配额。不存在的路径应该返回 HTTP 404，同时带上 `x-robots-tag: noindex`。
 
-### 3. 看起来可以像 SPA，但必须先吐出 HTML
+### 3. 可以做得像 SPA，但 HTML 要先出来
 
 | 部分 | 建议 |
 | --- | --- |
-| 首页、定价、Help、Blog、关于 | 静态生成或 SSR，构建期或请求时吐出完整 HTML |
-| 列表筛选 | 视觉可以像按钮，底层是独立路径 |
-| 真正的产品 App | 可以是 SPA，并 `noindex` |
-| 浏览器里才有意义的工具 | 说明文字进 HTML，交互可以靠 JS |
+| 首页、定价、Help、Blog、关于 | 静态生成或 SSR，构建时或请求时输出完整 HTML |
+| 列表筛选 | 看起来可以像按钮，底下是独立路径 |
+| 产品本身的 App | 可以是 SPA，加 `noindex` |
+| 只在浏览器里用的工具 | 说明文字放进 HTML，交互交给 JS |
 
-框架怎么选见第十一节。Help 用静态生成或 SSR，sidebar 的链接写在源码里，见第十三节。
+框架怎么选见第十一节，Help 的 sidebar 见第十三节。
 
-### 4. URL
+### 4. URL 怎么起
 
-好的路径像用户会搜的问题，也像导航：
+好的路径读起来像导航，也像用户会搜的问题：
 
 ```text
 /                    首页
@@ -580,61 +556,62 @@ SPA 常见的 soft 404 是：随便输入一个地址，HTTP 仍是 200，页面
 /privacy             隐私
 ```
 
-- 全小写、短横线、不要空格和驼峰
-- 一层一个主题，不要 `/help/index.html#/install`
-- 中英文站用目录或子域分开，并配 `hreflang`。只有一种语言，就不要假装做了双语
-- 改 URL 必须 301/308 到新地址，并更新 sitemap、llms.txt、导航
+全部小写，用短横线连接，不要空格和驼峰。一层只放一个主题，别出现 `/help/index.html#/install` 这种。中英文分开放在不同目录或子域，配上 `hreflang`；只有一种语言，就别硬做双语。改了 URL 一定要 301/308 到新地址，sitemap、llms.txt 和站内导航也一起改。
 
 ---
 
-## 十一、框架：内容站用 Astro，不用 Next.js
+## 十一、为什么用 Astro，不用 Next.js
 
-前面每一节都在要求同一件事：**关掉 JS 打开，HTML 里什么都有**。另一件事是快。Core Web Vitals 进排序，海外用户离你的服务器远，首屏多下发的每一百 KB JS 都是真的慢。
+前面几节反复在说一件事：关掉 JS，HTML 里该有的都得有。还有一件事是速度。Core Web Vitals 算进排序，海外用户离服务器又远，首屏每多一百 KB 的 JS，都能实实在在感觉到慢。
 
-营销页、Blog、Help 本质是文档。给文档站选框架，先看两点：默认吐出什么 HTML，默认下发多少 JS。
+营销页、Blog、Help 说到底都是文档。给这类站选框架，我们主要看两件事：默认输出什么样的 HTML，默认往浏览器里塞多少 JS。
 
-craftsail.com 用的是 Astro，第四节那行 `/_astro/...woff2` 就是它的构建产物。
+craftsail.com 用的是 Astro，第四节那个 `/_astro/...woff2` 路径就是它打出来的。
 
 ### 1. 对比
 
-| 维度 | Astro | Next.js |
+| | Astro | Next.js |
 | --- | --- | --- |
-| 默认下发的 JS | 0。只有标了 `client:*` 的组件才下发 JS（island） | React 运行时 + 路由，每页都要水合。Server Components 能少发组件代码，运行时省不掉 |
-| 首屏速度 | 纯 HTML + CSS，LCP、INP 不用调就容易达标 | 能做到，但要持续压 bundle、盯住 `'use client'` 的边界 |
-| 默认渲染 | 构建期静态生成，按页开 SSR | SSR / SSG / ISR / RSC 都有，模型复杂 |
-| 内容管理 | Content Collections：Markdown / MDX + schema 校验 | 要自己接 MDX 或第三方内容库 |
-| Blog feed 流 | `paginate()` 出分页 URL，`@astrojs/rss` 出 RSS，都是官方的 | 自己写分页路由和 RSS route handler |
-| Help sidebar | Starlight 官方文档主题，整树 sidebar 开箱 | Nextra、Fumadocs 等第三方 |
-| sitemap | `@astrojs/sitemap` | `app/sitemap.ts` 内置 |
-| 部署 | 产物是静态文件，任何 CDN、Cloudflare Pages、GitHub Pages、Nginx 都行 | 完整能力在 Vercel 最顺；`output: 'export'` 纯静态导出会丢掉 ISR、middleware、默认图片优化等 |
-| 交互重的 App | 弱。island 之间共享状态要自己处理 | 强项 |
-| 生态、招人 | 小一些，但可以在 island 里直接用 React / Vue / Svelte 组件 | React 生态最大 |
+| 默认下发的 JS | 0。只有标了 `client:*` 的组件（island）才下发 JS | React 运行时加路由，每页都要水合。Server Components 能少发组件代码，运行时还是要发 |
+| 首屏速度 | 纯 HTML + CSS，不怎么调 LCP、INP 就能达标 | 能做到，但要一直压包体积，盯着 `'use client'` 的边界 |
+| 默认渲染 | 构建时静态生成，个别页面再开 SSR | SSR、SSG、ISR、RSC 都有，规则多 |
+| 内容管理 | Content Collections，Markdown / MDX 加 schema 校验 | 自己接 MDX 或第三方内容库 |
+| Blog feed 流 | `paginate()` 生成分页 URL，`@astrojs/rss` 生成 RSS，都是官方的 | 分页路由和 RSS 的 route handler 自己写 |
+| Help sidebar | 官方文档主题 Starlight，侧栏现成 | Nextra、Fumadocs 等第三方 |
+| sitemap | `@astrojs/sitemap` | 内置 `app/sitemap.ts` |
+| 部署 | 产物是静态文件，任何 CDN、Cloudflare Pages、GitHub Pages、Nginx 都能放 | 在 Vercel 上最省心；`output: 'export'` 纯静态导出会丢掉 ISR、middleware、默认的图片优化等 |
+| 交互复杂的 App | 不擅长，island 之间共享状态要自己处理 | 擅长 |
+| 生态、招人 | 小一些，不过 island 里可以直接用 React / Vue / Svelte 组件 | React 生态最大 |
 
-### 2. Astro 的短板
+### 2. Astro 的缺点
 
-- **跨页跳转是整页加载**。开 `prefetch`，或用 `<ClientRouter />` 做页面过渡，体感能补回大半
-- **island 各自独立**。多个交互组件共享状态，要用 nanostores 之类自己接
-- **全静态时，发文要重新构建部署**。日更 3 篇、几千篇的规模没问题；上万篇再考虑按需 SSR 或拆分构建
-- **登录后的复杂 App 不是它的强项**
+用下来，Astro 有几处不太顺手。
 
-### 3. Next.js 放在内容站上的问题
+页面之间跳转是整页刷新。打开 `prefetch`，或者加上 `<ClientRouter />` 做过渡，大部分时候感觉不出来。
 
-- 纯文字页也要下发 React 运行时并水合，这部分 JS 对爬虫和读者都没用
-- 渲染、缓存模型多，一个 `'use client'` 放错位置，整棵子树都变成客户端组件
-- 离开 Vercel 自托管，ISR、图片优化、缓存都要自己兜
-- Blog + Help 用不上它的大部分能力，成本却要全付
+页面上的交互组件（island）彼此独立。几个组件要共享状态，得自己接 nanostores 之类的库。
 
-Next.js 不是做不好 SEO，是要花额外的功夫才能做到 Astro 的默认值。
+全静态生成的话，每发一篇文章都要重新构建、部署。一天 3 篇、总量几千篇没什么压力，真到了上万篇，再考虑按需 SSR 或者拆分构建。
 
-### 4. 怎么分
+登录以后那种交互很重的 App，它也不擅长。
+
+### 3. Next.js 用在内容站上的问题
+
+Next.js 也能把 SEO 做好，只是放在内容站上，要多花不少力气，才能做到 Astro 默认的水平。
+
+纯文字页面也要下发 React 运行时，再水合一遍，这些 JS 对爬虫和读者都没用。它的渲染方式和缓存规则比较多，`'use client'` 放错一个位置，下面整棵组件树都会变成客户端组件。不用 Vercel、自己托管的话，ISR、图片优化、缓存都得自己处理。Blog 和 Help 用不到它的大部分功能，这些成本却一样不少。
+
+### 4. 我们怎么分
 
 | 部分 | 用什么 |
 | --- | --- |
-| 首页、定价、关于、Blog、Help | Astro 静态生成；Help 用 Starlight 或自己写 sidebar 组件 |
-| 页面上的少量交互：搜索框、订阅表单、图表 hover | Astro 里挂 island：`client:idle`、`client:visible` |
-| 登录后的 App、编辑器、控制台 | React、Next、任何 SPA 都行；放 `/app/` 或 `app.` 子域，`noindex` |
+| 首页、定价、关于、Blog、Help | Astro 静态生成；Help 用 Starlight 或自己写侧栏组件 |
+| 页面上零星的交互：搜索框、订阅表单、图表 hover | 在 Astro 里挂 island，用 `client:idle` 或 `client:visible` |
+| 登录后的 App、编辑器、控制台 | React、Next 或别的 SPA 都行，放在 `/app/` 或 `app.` 子域，加 `noindex` |
 
-给爬虫和新用户看的部分用 Astro，给登录用户用的部分再谈 React。
+对外给爬虫和新用户看的页面用 Astro，登录以后的部分再考虑 React。
+
+页面上需要一点交互时，这样挂一个 island：
 
 ```astro
 ---
@@ -658,29 +635,31 @@ export default defineConfig({
 });
 ```
 
-- `site` 必须写，不写 sitemap 和 RSS 拼不出绝对地址
-- 尾斜杠只留一种（`trailingSlash`），和部署平台的行为、canonical、sitemap 对齐
-- 图片用 `astro:assets` 的 `<Image />`，自动带 `width` / `height`，不产生 CLS
+`site` 一定要写，sitemap 和 RSS 靠它生成绝对地址。要不要尾斜杠，用 `trailingSlash` 定下来，和部署平台的行为、canonical、sitemap 保持一致。图片用 `astro:assets` 的 `<Image />`，它会自动带上 `width` 和 `height`，不会引起布局抖动。
 
-### 6. 验收速度
+### 6. 怎么验收速度
 
-- `curl -s https://example.com/blog/ | grep -c '<script'`：内容页应该接近 0
-- PageSpeed Insights 移动端跑三页：首页、一篇 Blog、一篇 Help
-- 目标按 Google 的「良好」线：LCP < 2.5s，INP < 200ms，CLS < 0.1
+先 `curl` 一个内容页，数一下有几个 `<script>`：
+
+```bash
+curl -s https://example.com/blog/ | grep -c '<script'
+```
+
+内容页应该是 0，或者很接近 0。然后用 PageSpeed Insights 的移动端测三页：首页、一篇 Blog、一篇 Help。达标线按 Google 定的「良好」：LCP 低于 2.5 秒，INP 低于 200 毫秒，CLS 低于 0.1。
 
 ---
 
-## 十二、Blog：用 feed 流让搜索引擎持续来抓
+## 十二、Blog 做成 feed 流
 
-首页、定价、Help 改得少。搜索引擎要不要经常回访，看你有没有稳定的新文档。Blog 干这个。
+首页、定价、Help 很少改。搜索引擎多久回来一次，要看你是不是稳定地有新页面，Blog 就是干这个的。
 
-节奏可以定死：**每天 3 篇**，每篇独立 URL，当天进 sitemap，RSS 跟着更新。爬虫发现这个站每天都有新 HTML，就会提高抓取频率。3 篇是给管道的配额，不是凑字数。同一段话换标题发三次，等于在生产薄页。
+我们的节奏是每天 3 篇。每篇一个独立 URL，发布当天进 sitemap，RSS 同步更新。爬虫发现这个站每天都有新东西，来得就勤了。3 篇是给数据管道定的量，不是为了凑数，同一段话换三个标题发出去，只会多出三个薄页。
 
-### 1. `/blog/` 做成 feed 流
+### 1. `/blog/` 长什么样
 
-按发布时间倒序排成一条流，最新的在最上面。每天 3 篇进来，`/blog/` 这一页的 HTML 每天都在变。爬虫回访这一页，一次就拿到当天所有新链接。
+`/blog/` 按发布时间倒序排成一条流，最新的在最上面。每天 3 篇进来，这一页的 HTML 每天都在变，爬虫回来一趟，当天的新链接就都拿到了。
 
-流里每一条是卡片，不是全文：
+流里每一条只放卡片，不放全文：
 
 ```html
 <main>
@@ -718,18 +697,17 @@ export default defineConfig({
 </main>
 ```
 
-- 卡片标题是 `<a href>`，指向文章独立 URL
-- 卡片只放标题、日期、类型、一两句摘要、缩略图。全文只在文章页，不要列表页和文章页各一份
-- `<time datetime>` 写真实发布时间
-- 分类是独立路径 `/blog/type/data/`，不是 `?type=data`，也不是前端 Tab 过滤
-- 首屏第一张缩略图不要 `loading="lazy"`，它往往就是 LCP；后面的可以 lazy
-- 首页放最新 5–10 条同样的卡片，链到 `/blog/`
+卡片的标题包在 `<a href>` 里，指向文章自己的 URL。卡片上放标题、日期、分类、一两句摘要和一张缩略图就够了。全文只留在文章页，别让列表页和文章页各有一份。`<time datetime>` 填真实的发布时间。
 
-### 2. 可以无限滚动，底下必须是分页 URL
+分类用独立路径 `/blog/type/data/`，不用 `?type=data`，也不做成前端的 Tab 切换。
 
-feed 流最常见的坑：只做「滚到底自动加载」。爬虫不滚动，也不点「加载更多」，只看得到第一屏 20 篇，更早的文章只能靠 sitemap。
+首屏第一张缩略图别加 `loading="lazy"`，它很可能就是 LCP 元素，后面的图再 lazy。首页可以放最新 5 到 10 条同样的卡片，再链到 `/blog/`。
 
-Google 对无限滚动的建议是：背后要有一组能直接打开的分页 URL。
+### 2. 无限滚动要有分页 URL 兜底
+
+feed 流最容易出问题的地方，是只做了「滚到底自动加载」。爬虫不会滚动，也不会点「加载更多」，最后只看得到第一屏的 20 篇，更早的文章全靠 sitemap。
+
+Google 对无限滚动的建议，是在背后准备一组能直接打开的分页 URL：
 
 ```text
 /blog/      最新 20 篇
@@ -737,19 +715,15 @@ Google 对无限滚动的建议是：背后要有一组能直接打开的分页 
 /blog/3     ...
 ```
 
-- 每一页 HTML 里都有指向上一页 / 下一页的 `<a href>`
-- 「加载更多」底子是 `<a href="/blog/2">`。JS 可以接管它，把下一页拼到当前列表，再用 `history.pushState` 把地址改成 `/blog/2`；关了 JS，它就是一个普通链接
-- 每个分页页 canonical 指向自己，不要全部指回 `/blog/`
-- 分页页 title 带页码：`Blog — Page 2 — Acme`
-- 分页页不必进 sitemap，文章页必须进
+每一页的 HTML 里都要有上一页、下一页的 `<a href>`。「加载更多」本身就写成 `<a href="/blog/2">`：有 JS 时拦截点击，把下一页的卡片接到当前列表后面，再用 `history.pushState` 把地址栏改成 `/blog/2`；没有 JS，它就是一个普通链接。
 
-### 3. 有数据就上图表
+分页页的 canonical 指向自己，别统统指回 `/blog/`。title 带上页码，比如 `Blog — Page 2 — Acme`。分页页不用进 sitemap，文章页必须进。
 
-纯文字日报，看起来像模板。数字画成图，正文里再放能读的数。爬虫不执行 Canvas。图必须在初始 HTML 里：
+### 3. 有数据就画图
 
-- 内联 SVG，或 `<img>` + 写清数字的 `alt`
-- 下面配 `<table>` 或一段结论，图挂了文字还在
-- `<figure>` + `<figcaption>`，caption 用普通人能读的句子，不要只写「图 1」
+纯文字的日报，很容易看起来像模板生成的。有数字就画成图，正文里再写一遍能直接读的数。
+
+爬虫不执行 Canvas，所以图要在初始 HTML 里：用内联 SVG，或者 `<img>` 加上把数字写清楚的 `alt`。图下面配一个 `<table>` 或一段结论，图挂了，文字还在。外面套 `<figure>` 和 `<figcaption>`，caption 写一句正常人能看懂的话，别只写「图 1」。
 
 ```html
 <figure>
@@ -771,42 +745,40 @@ Google 对无限滚动的建议是：背后要有一组能直接打开的分页 
 </table>
 ```
 
-有数据管道就从管道出这 3 篇，不要手写灌水。没数据的那篇就别发。
+有数据管道，这 3 篇就从管道里出，别手写灌水。哪天没数据，那篇就不发。
 
-### 4. 结构要能区分
+### 4. 三篇的结构要不一样
 
-三篇不要套同一套「引言 — 三点 — 总结」。类型不同，HTML 骨架就不同，爬虫和人才能看出这是三份文档，不是一个模板填了三次。
+三篇别都套「引言、三点、总结」。类型不一样，HTML 结构也该不一样，人和爬虫才看得出这是三篇文章，而不是一个模板填了三次。
 
-| 类型 | URL 例子 | 骨架 |
+| 类型 | URL 例子 | 结构 |
 | --- | --- | --- |
 | 数据 / 日报 | `/blog/2026-09-19-signups` | 一句话结论 → 图 → 数字表 → 比昨天多了什么 |
-| 教程 | `/blog/install-cli-on-macos` | 步骤用 `h2`，命令进 `<pre>` |
-| 对比 | `/blog/acme-vs-foo-pricing` | 对照表，列是产品，行是项 |
+| 教程 | `/blog/install-cli-on-macos` | 每一步一个 `h2`，命令放进 `<pre>` |
+| 对比 | `/blog/acme-vs-foo-pricing` | 对照表，每列一个产品，每行一项 |
 
-`og:type=article`，补 `article:published_time`。JSON-LD 用 `BlogPosting`，`image` 指向那张图。列表页 `/blog/` 是 `CollectionPage`，不要把全部正文堆进列表。
+文章页的 `og:type` 用 `article`，加上 `article:published_time`。JSON-LD 用 `BlogPosting`，`image` 指向那张图。列表页 `/blog/` 用 `CollectionPage`，别把全文都堆到列表里。
 
-### 5. 发现路径和订阅
+### 5. 让新文章被找到
 
 ```text
 /blog/                      feed 第一页
 /blog/2                     feed 分页
 /blog/type/data/            分类 feed
 /blog/2026-09-19-signups    一篇
-/rss.xml                    RSS，全文或摘要均可
+/rss.xml                    RSS，全文或摘要都行
 /sitemap-blog.xml           只放已发布、200、canonical 的文章
 ```
 
-- 每页 `<head>` 都带 `<link rel="alternate" type="application/rss+xml" href="/rss.xml">`
-- RSS 放最新 20–50 篇，`pubDate` 是真实发布时间，`link` 是 canonical URL
-- 页面上的 feed 流和 RSS 用同一份数据、同一个排序，不要两边对不上
+每页的 `<head>` 里都放一行 `<link rel="alternate" type="application/rss+xml" href="/rss.xml">`。RSS 保留最新 20 到 50 篇，`pubDate` 用真实发布时间，`link` 用 canonical URL。页面上的 feed 和 RSS 要来自同一份数据、同一个排序，别出现两边对不上的情况。
 
-页头、页脚、相邻文章、相关 Help 都用 `<a href>` 指过来。新文章只出现在首页 JS 里、不进 sitemap、没有内链，爬虫来得慢。
+页头、页脚、上一篇下一篇、相关的 Help 文档，都用 `<a href>` 链到文章。新文章如果只出现在首页的 JS 里，不进 sitemap，也没有站内链接，爬虫会来得很慢。
 
-转载、RSS 搬运、把别人的 changelog 改写一遍，都不进 `/blog/`。那些该链到原文。
+转载、搬运 RSS、把别人的 changelog 改写一遍，这些都不放进 `/blog/`，直接链原文。
 
-### 6. 用 Astro 写 feed 流
+### 6. 用 Astro 实现
 
-文章放在 Content Collection 里，排序抽成一个函数，feed 页和 RSS 共用：
+文章放在 Content Collection 里。排序单独写成一个函数，feed 页和 RSS 都用它：
 
 ```ts
 // src/lib/posts.ts
@@ -818,7 +790,7 @@ export async function getPosts() {
 }
 ```
 
-`[...page].astro` 让第一页落在 `/blog/`，后面是 `/blog/2`、`/blog/3`，构建期全部生成静态 HTML：
+分页页面用 `[...page].astro`，第一页正好是 `/blog/`，后面是 `/blog/2`、`/blog/3`，构建时全部生成静态 HTML：
 
 ```astro
 ---
@@ -842,6 +814,8 @@ const { page } = Astro.props;
 </nav>
 ```
 
+RSS：
+
 ```js
 // src/pages/rss.xml.js
 import rss from '@astrojs/rss';
@@ -863,25 +837,19 @@ export async function GET(context) {
 }
 ```
 
-文章 slug 用日期或英文短语（`2026-09-19-signups`），不要用纯数字，免得和分页 `/blog/2` 撞路径。
+文章的 slug 用日期或英文短语，比如 `2026-09-19-signups`。别用纯数字，不然会和分页的 `/blog/2` 撞路径。
 
 ---
 
-## 十三、Help 要有侧栏：这是在给搜索引擎铺内链
+## 十三、Help 的侧栏
 
-用户能从侧栏跳，爬虫也能从侧栏发现。Help 做成「一篇正文 + 左侧一排 `<a href>`」，是文档站最划算的 SEO 结构。
+用户靠侧栏跳转，爬虫也靠侧栏发现页面。「一篇正文，左边一列 `<a href>`」，对文档站来说是花力气最少、SEO 收益最大的结构。
 
-没有侧栏的 Help，往往是一个单页，或者每次只渲染当前篇。爬虫进来只能看到这一篇，深处文档要靠 sitemap 碰运气。
+没有侧栏的 Help，通常是一个大单页，或者每次只渲染当前这一篇。爬虫进来只看得到这一篇，更深的文档只能指望 sitemap。
 
-有侧栏之后，每一篇文档的 HTML 里都会带上几十个指向兄弟页面的真实链接：
+有了侧栏，每篇文档的 HTML 里都带着几十个指向其他文档的真实链接。新文档更容易被发现，同一主题的文档（入门、AI、权限、安装）被链成一组，链接文字本身又是关键词，比如 `Install on Kubernetes`、`Bring your own model`。Stripe、Cloudflare、MDN、GitHub Docs 的侧栏都是真链接，没有一家是点开才加载的 JS 菜单。
 
-- 新文档更容易被发现
-- 主题簇（getting started、AI、权限、安装）被链接成一组
-- 锚文本就是关键词：`Install on Kubernetes`、`Bring your own model`
-
-这就是为什么 Stripe、Cloudflare、MDN、GitHub Docs 全都把侧栏做成真链接，而不是折叠后的 JS 菜单。
-
-### 1. 侧栏必须是 HTML 链接，不能是点开才加载的树
+### 1. 侧栏的链接要写在 HTML 里
 
 ```html
 <aside>
@@ -912,21 +880,23 @@ export async function GET(context) {
 </article>
 ```
 
-折叠可以用 CSS / JS，但折叠前源码里就要有这些 `<a>`。不要等点击「AI」分组后才把子链接插入 DOM。`<details open>` 可以，点击后再 `fetch` 子树不行。
+折叠效果可以用 CSS 或 JS 做，但折叠之前，这些 `<a>` 就得在源码里。不能等用户点开「AI」分组，才把下面的链接插进 DOM。用 `<details open>` 没问题，点击后再 `fetch` 子树就不行。
 
-当前篇用 `<span>` 或 `aria-current="page"`，其余全部是链接。锚文本写人会搜的词，不要全写 `Click here`。
+当前这篇用 `<span>`，或者加 `aria-current="page"`，其他全是链接。链接文字写用户会搜的词，别一排 `Click here`。
+
+用 curl 检查一下：
 
 ```bash
 curl -sL https://example.com/help/getting-started/install | grep 'href="/help/'
 ```
 
-源码里应出现 What is Acme、Bring your own model、Audit logs 这些兄弟链接，不只是当前这篇。Google 也许能渲染客户端 sidebar，Bing 和不少 AI 爬虫不能。
+源码里应该能搜到 What is Acme、Bring your own model、Audit logs 这些其他文档的链接，而不只是当前这一篇。Google 也许能渲染客户端生成的侧栏，Bing 和很多 AI 爬虫不行。
 
-优先 Astro（Starlight 或自己写组件，见本节第 5 小节）；Docusaurus、VitePress、Mintlify 也行。它们默认就是「一篇正文 + 左侧一排真链接」。不要用纯客户端 React SPA 硬做 Help。
+框架我们推荐 Astro，用 Starlight 或者自己写组件都行，写法见本节第 5 小节。Docusaurus、VitePress、Mintlify 也可以，它们默认就是这种结构。别用纯客户端的 React SPA 去硬做 Help。
 
-### 2. 一篇文档里再放相关链接和面包屑
+### 2. 面包屑和相关链接
 
-侧栏是纵向发现，正文里的相关链接是横向加分。
+侧栏负责上下层级，正文里的相关链接负责把不同主题连起来。
 
 ```html
 <nav aria-label="Breadcrumb">
@@ -950,32 +920,26 @@ curl -sL https://example.com/help/getting-started/install | grep 'href="/help/'
 </section>
 ```
 
-面包屑配 `BreadcrumbList` JSON-LD。文档层级深的站点，搜索结果里有机会出现 `Help > Getting started > Install`。
+面包屑再配一段 `BreadcrumbList` JSON-LD。层级深的文档站，搜索结果里有机会显示成 `Help > Getting started > Install`。
 
-### 3. 一个 URL 回答一个问题
+### 3. 一个 URL 只回答一个问题
 
-文档站不要写成产品手册目录。
+文档站别写成一本产品手册的目录。
 
-| 弱页面 | 更有搜索价值的页面 |
+| 弱的页面 | 更容易被搜到的页面 |
 | --- | --- |
 | `/help/overview` | `/help/getting-started/what-is-acme` |
 | `/help/ai` | `/help/ai/byok`、`/help/ai/agents` |
-| `/help/faq` 一页装 40 问 | 高频问题各写一篇；入口页 FAQ 只留 6–8 个链接 |
+| `/help/faq` 一页 40 问 | 高频问题各写一篇；入口页的 FAQ 只留 6–8 个链接 |
 | `/help/security` | `/help/security/permissions`、`/help/security/audit-logs` |
 
-每篇固定结构：
+每篇文档的结构固定下来：H1 写问题或任务，前两段直接给结论，然后是步骤、注意事项和限制，接着放相关链接，最后写上更新时间。
 
-1. H1 就是问题或任务
-2. 前两段直接给结论
-3. 步骤 / 注意 / 限制
-4. 相关链接
-5. 最后更新时间
+这样的页面，搜索引擎和 AI 才愿意直接拿来当答案；侧栏再把它们连成一张网，它们才找得到。GEO 以后单独写一篇。
 
-这就是标准答案页。Help 侧栏把这些页连成网，搜索和 AI 才找得到、愿意引用。GEO 会另写。
+### 4. 可以参考的文档站
 
-### 4. 可以对照的文档站
-
-打开这些页面的「查看源代码」，都能看到侧栏里成排的 `href`：
+打开下面这些页面的源代码，侧栏里都是一排排的 `href`：
 
 - https://docs.stripe.com/payments/checkout
 - https://developers.cloudflare.com/workers/get-started/guide/
@@ -983,11 +947,11 @@ curl -sL https://example.com/help/getting-started/install | grep 'href="/help/'
 - https://docusaurus.io/docs/seo
 - https://mintlify.com/docs/ai/llmstxt
 
-不要对照的：把帮助中心做成一个 iframe、一个 SPA、一个「搜索框 + 无链接结果」的知识库。那类系统对人也许能搜，对爬虫是黑盒。
+别参考的：把帮助中心做成 iframe、做成 SPA，或者只有一个搜索框、结果不带链接的知识库。这类系统人还能搜一搜，爬虫什么都看不到。
 
-### 5. 用 Astro 写 Help sidebar
+### 5. 用 Astro 实现
 
-**省事：Starlight。** Astro 官方的文档主题。sidebar、上一篇 / 下一篇、页内目录、Pagefind 站内搜索都开箱；分组折叠用的是 `<details>`，整树链接在源码里。面包屑默认没有，要自己覆盖组件或装社区插件。
+最省事的是 Starlight，Astro 官方的文档主题。侧栏、上一篇下一篇、页内目录、Pagefind 站内搜索都是现成的，分组折叠用的是 `<details>`，所有链接都在源码里。它默认不带面包屑，要自己覆盖组件，或者装社区插件。
 
 ```js
 // astro.config.mjs
@@ -1009,9 +973,9 @@ export default defineConfig({
 });
 ```
 
-文档放 `src/content/docs/help/getting-started/install.md`，URL 就是 `/help/getting-started/install`。
+文档放在 `src/content/docs/help/getting-started/install.md`，URL 就是 `/help/getting-started/install`。
 
-**要和主站同一套样式：自己写 sidebar 组件。** 它在构建期运行，输出就是整树 `<a>`，没有一行客户端 JS：
+想和主站用同一套样式，就自己写一个侧栏组件。它在构建时运行，生成的就是整棵树的 `<a>`，浏览器端一行 JS 都没有：
 
 ```astro
 ---
@@ -1040,127 +1004,97 @@ const current = Astro.url.pathname;
 </nav>
 ```
 
-两种做法都用第 1 小节那条 `curl | grep 'href="/help/'` 验收。
+不管用哪种，都拿第 1 小节那条 `curl | grep 'href="/help/'` 验收。
 
 ---
 
-## 十四、导航、页脚
+## 十四、每类页面的静态信息
 
-页头、页脚也要是真实 `<a href>`。Help 的侧栏、面包屑、文末 Next 见上一节，不要只在首页放一个「Docs」按钮。
+首页那段 `<head>` 只适合首页。内页的 title、description、canonical、og:url 和 JSON-LD 都要单独写。
 
-页脚把 Blog、Help、定价都链上。营销页之间同样用真链接互指，不要只靠 JS 路由。
-
----
-
-## 十五、按页面类型写静态信息
-
-首页那段 `<head>` 只能当首页用。内页要改 title、description、canonical、og:url、JSON-LD。
-
-产品站：
+产品站可以照这张表：
 
 | 页面 | title | JSON-LD |
 | --- | --- | --- |
 | `/` | 品牌 + 品类 | Organization + WebSite + SoftwareApplication |
-| `/pricing` | `Pricing — {品牌}` | 价格在正文里，和 schema 一致 |
-| `/help/{path}` | 这一页的问题 | TechArticle / FAQPage |
+| `/pricing` | `Pricing — {品牌}` | 价格写在正文里，和 schema 一致 |
+| `/help/{path}` | 这一页回答的问题 | TechArticle / FAQPage |
 | `/blog/{slug}` | 文章标题 | BlogPosting；`og:type=article`；有图就写 `image` |
 | `/about` | `About {品牌}` | WebPage；需要时加 FAQPage |
 | `/app`、`/account` | 不收录 | `noindex`，不进 sitemap |
 
-Organization 用稳定 `@id`：`https://example.com/#organization`。内页用引用，不要把首页整份 `@graph` 复制过去。
+Organization 用一个固定的 `@id`，比如 `https://example.com/#organization`，内页引用它就行，别把首页整个 `@graph` 复制过去。
 
-- 首页：`SoftwareApplication` 的价格必须和定价页可见内容一致
-- `/pricing`：价格写在正文里，不只写在按钮上
-- `/blog/{slug}`、`/help/{path}`：一篇一个 URL，进 sitemap。Help 稳定入口写进 `llms.txt`；Blog 只把常青文写进去，日报不必进 `llms.txt`
-- App：`noindex`，不要放进 sitemap
+首页 `SoftwareApplication` 里的价格，要和定价页上写的一样；`/pricing` 的价格要写在正文里，不能只出现在按钮上。Blog 和 Help 都是一篇一个 URL，都进 sitemap。`llms.txt` 里放 Help 的稳定入口，Blog 只放常青文章，日报不用放。App 加 `noindex`，不进 sitemap。
 
-聚合站把 `SoftwareApplication` 换成目录类型，ItemList 指向原文，FAQ 不要塞进数据首屏。
+聚合站把 `SoftwareApplication` 换成目录类型，ItemList 指向原文，FAQ 别放在数据首屏。
 
 ---
 
-## 十六、不要做的事
-
-- 不为每条 RSS / 转载做本站文章页；Blog 日更必须带本站数据或本站步骤
-- 图表只画在 Canvas / 客户端 chart 里，源码里没有数字
-- 三篇 Blog 共用一个 HTML 骨架，只换标题
-- `/blog/` 只做无限滚动，没有能直接打开的分页 URL
-- 分页页 canonical 全部指回 `/blog/`
-- Help sidebar 靠 JS 点击后才插入链接
-- Help 做成 iframe、纯 SPA、或「搜索框 + 无链接结果」的知识库
-- `/help/faq` 一页塞几十问，不给高频问题独立 URL
-- 没有独立内容，就不新建 Docusaurus / VitePress / Starlight Help
-- 营销页、Blog、Help 用整页水合的 React 框架，纯文字页也下发几百 KB JS
-- 不写 `meta keywords`，不编评分
-- 只有一种语言，就不做 `hreflang`
-- 不把 FAQ 硬塞进不该回答问题的页面
-- 不把会过期的 ID 写进 `llms.txt`
-- sitemap 文件还 404，就不要写进 robots
-
----
-
-## 十七、落地清单
-
+## 十五、落地清单
 
 ### 框架与速度
 
-- [ ] 营销页、Blog、Help 用 Astro 静态生成；登录后的 App 单独部署并 `noindex`
-- [ ] 内容页 `curl` 下来几乎没有 `<script>`，交互组件用 `client:idle` / `client:visible`
+- [ ] 营销页、Blog、Help 用 Astro 静态生成；登录后的 App 单独部署，加 `noindex`
+- [ ] `curl` 下来的内容页几乎没有 `<script>`；交互组件用 `client:idle` / `client:visible`
 - [ ] PageSpeed Insights 移动端：LCP < 2.5s，INP < 200ms，CLS < 0.1
 
 ### 站点根文件
 
-- [ ] `https://example.com/robots.txt` 可打开，含 `Sitemap:` 行
-- [ ] `Sitemap:` 指向的文件都能打开，只包含 200、canonical、可收录 URL
-- [ ] `https://example.com/llms.txt` 是 Markdown 目录，链接都是真实、稳定的页面
-- [ ] 没有把预发环境、App、后台、会消失的 ID 放进 sitemap / `llms.txt`
+- [ ] `https://example.com/robots.txt` 能打开，有 `Sitemap:` 行
+- [ ] `Sitemap:` 指向的文件都能打开，里面只有 200、canonical、可收录的 URL
+- [ ] `https://example.com/llms.txt` 是 Markdown 目录，链接都真实、稳定
+- [ ] 预发环境、App、后台、会消失的 ID 都没进 sitemap 和 `llms.txt`
 
 ### 每个可收录页的静态信息
 
-- [ ] 独立 `<title>`
-- [ ] 独立 `meta description`
-- [ ] 自指 `canonical`
+- [ ] 自己的 `<title>`
+- [ ] 自己的 `meta description`
+- [ ] 指向自己的 `canonical`
 - [ ] `og:title` / `og:description` / `og:url` / `og:image`（1200×630）
 - [ ] `twitter:card = summary_large_image`
-- [ ] 需要的 JSON-LD，且与可见内容一致
-- [ ] 这些标签在「查看源代码」里就有，不是 JS 后插入
+- [ ] 需要的 JSON-LD 都写了，内容和页面一致；没有编造评分
+- [ ] 没写 `meta keywords`；只有一种语言就没写 `hreflang`
+- [ ] 这些标签在「查看网页源代码」里就有，不是 JS 后插的
 
 ### Blog
 
-- [ ] `/blog/` 是倒序 feed 流，卡片标题是 `<a href>`，只放摘要不放全文
-- [ ] feed 有分页 URL（`/blog/2`），每页有上一页 / 下一页 `<a href>`，canonical 指向自己
-- [ ] 分类是独立路径（`/blog/type/data/`），不是 query 或前端 Tab
-- [ ] feed 流和 RSS 同一份数据、同一个排序；每页 `<head>` 有 RSS `alternate`
+- [ ] `/blog/` 是倒序的 feed 流，卡片标题是 `<a href>`，只放摘要不放全文
+- [ ] feed 有分页 URL（`/blog/2`），每页有上一页 / 下一页的 `<a href>`，canonical 指向自己
+- [ ] 分类是独立路径（`/blog/type/data/`），不是 query，也不是前端 Tab
+- [ ] feed 和 RSS 用同一份数据、同一个排序；每页 `<head>` 有 RSS 的 `alternate`
 - [ ] `/blog/{slug}` 一篇一个 URL，`og:type=article`
-- [ ] 每天固定 3 篇则 3 个新 URL，当天进 `sitemap-blog.xml` 和 RSS
-- [ ] 有数据的篇：图在 HTML 里（SVG 或 `<img>`），旁边有表或可读数字
-- [ ] 数据篇 / 教程 / 对比不是同一套 DOM
+- [ ] 每天 3 篇就是 3 个新 URL，当天进 `sitemap-blog.xml` 和 RSS
+- [ ] 数据类文章的图在 HTML 里（SVG 或 `<img>`），旁边有表格或能直接读的数字
+- [ ] 数据、教程、对比三类文章的 HTML 结构不一样
 - [ ] 转载不进 `/blog/`
 
 ### Help
 
-- [ ] `/help/{path}` 一篇一个 URL，一个问题，没有 `#/`
-- [ ] 关 JS 打开任一 Help 页，源码里能搜到 sidebar 上其它文档的 `href="/help/`
-- [ ] 折叠用 CSS / `<details>`，不靠点击再插入链接
-- [ ] 锚文本是问题本身：`Install on Kubernetes`、`Bring your own model`
-- [ ] 每篇有面包屑、文末相关链接；面包屑配 `BreadcrumbList`
-- [ ] H1 是问题或任务，前两段先给结论，页脚有最后更新时间
-- [ ] 高频 FAQ 各写一篇，不要一页装 40 问
+- [ ] `/help/{path}` 一篇一个 URL，只回答一个问题，没有 `#/`
+- [ ] 关掉 JS 打开任意一篇，源码里能搜到侧栏上其他文档的 `href="/help/`
+- [ ] 折叠用 CSS 或 `<details>`，不是点击后再插链接
+- [ ] 链接文字就是问题本身：`Install on Kubernetes`、`Bring your own model`
+- [ ] 每篇有面包屑和文末相关链接，面包屑配 `BreadcrumbList`
+- [ ] H1 是问题或任务，前两段先给结论，页脚有更新时间
+- [ ] 高频问题各写一篇，没有一页塞 40 问的 FAQ
+- [ ] FAQ 只放在会有人来找答案的页面
 
 ### URL 与链接
 
 - [ ] 主题、关于、Help、定价、对比、Blog 都是独立路径，没有 `#/`
-- [ ] 导航、卡片、筛选、页脚、sidebar、按钮式入口全部是 `<a href>`
+- [ ] 导航、卡片、筛选、页脚、侧栏、按钮样式的入口都是 `<a href>`
 - [ ] 源码里能搜到这些 href
 - [ ] 不存在的文档返回 HTTP 404
-- [ ] 改版旧地址 301/308 到新地址
+- [ ] 改版后旧地址 301/308 到新地址
 
 ### 提交与验收
 
 - [ ] Google Search Console 验证域名，提交 sitemap
-- [ ] URL Inspection 看「已抓取的页面」是不是完整 HTML
-- [ ] Rich Results Test 检查 Organization / FAQPage
-- [ ] 分享一次到 Slack / X / LinkedIn，确认卡片图和标题
-- [ ] 用无 JS 环境打开一个内页，正文和导航链接仍在
+- [ ] 用 URL Inspection 看「已抓取的页面」是不是完整的 HTML
+- [ ] 用 Rich Results Test 检查 Organization / FAQPage
+- [ ] 往 Slack、X、LinkedIn 各分享一次，确认卡片的图和标题
+- [ ] 在没有 JS 的环境里打开一个内页，正文和导航链接都还在
 
 ---
 
