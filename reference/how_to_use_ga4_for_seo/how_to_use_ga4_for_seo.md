@@ -1,3 +1,5 @@
+> https://www.orbitmedia.com/blog/ga4-seo/
+
 Ranking isn’t really the goal in SEO. Traffic is. That means we need to use GA4 for SEO reporting, because traffic data isn’t in the SEO tools.
 
 Traffic isn’t the ultimate goal in SEO either. Lead generation is. That means we need quality traffic that converts into leads. That also means we need to use GA4, because that’s where our conversion data is.
