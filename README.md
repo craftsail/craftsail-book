@@ -19,6 +19,11 @@
 
 [造物局 CraftSail](https://craftsail.com) 做过的方法，写在这里。能在线上核对的才进目录。
 
+加我进群
+
+<img src="assets/wechat.png" width="150" />
+
+
 ## 样本
 
 CraftSail 是面向独立开发者和小团队的 AI / 开发者趋势数据门户。
@@ -55,6 +60,9 @@ X、LinkedIn、Reddit、YouTube、Threads、Bluesky 上的账号怎么从 0 做�
 | [避免同质化：四个内容方法论](account/避免同质化的四个内容方法论.md) | 流水线做久了内容会长得一样：X 源码里的作者去重和负反馈、YouTube 2025 年「不真实内容」政策、广告磨损实验（读者在乎时只有实质变化有用）、生成式 AI 让内容彼此更像（Doshi & Hauser 2024）；四个各管一个维度的方法论——Hero / Hub / Help 管分量和节奏，新闻价值（Harcup & O'Neill 2017）管角度，STEPPS 和 Berger & Milkman 管传播动机，探索与利用（Thompson 抽样）管实验；可运行的 [content_mix.py](account/tools/content_mix.py) 算同质化程度、排下周计划；一个选题一周的四种发法和发前自检 |
 
 ## 相关
+
+- logo: https://github.com/kaankiziltug/logo-design-skill
+- 视频：https://github.com/feitangyuan/onetake
 
 - 线上样本：[craftsail.com](https://craftsail.com)
 - 产品仓库：[github.com/craftsail/craftsail](https://github.com/craftsail/craftsail)
