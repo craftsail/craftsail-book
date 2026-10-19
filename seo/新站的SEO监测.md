@@ -282,7 +282,7 @@ AI 来源单独建一个渠道，正则见 [SEO 的监测](SEO的监测.md) 第�
 - 提交同一份 sitemap
 - 接 IndexNow：根目录放一个 key 文件，发布或更新页面时推一下 URL，Bing 和其他支持 IndexNow 的搜索引擎会很快来抓。Astro、WordPress 都有现成插件
 
-Bing 自己的份额不大，但很多观察认为 ChatGPT 搜索、Copilot 的结果很大程度来自 Bing 的索引（这一点 OpenAI 没有公开确认）。Bing Webmaster Tools 从 2026 年 2 月起有 AI Performance 报告（预览），能看到页面被 Copilot 和 Bing AI 摘要引用的次数。对新站来说，这是少数几个能直接看到「AI 有没有引用我」的地方。
+Bing 自己的份额不大，但 Copilot、Yahoo、DuckDuckGo 都用它的索引。ChatGPT 搜索以前被认为主要靠 Bing，2026 年的研究显示它已经以 OpenAI 自建索引为主，Bing 只是备用来源之一，详见 [Bing 的收录](Bing的收录.md)。Bing Webmaster Tools 从 2026 年 2 月起有 AI Performance 报告（预览），能看到页面被 Copilot 和 Bing AI 摘要引用的次数。对新站来说，这是少数几个能直接看到「AI 有没有引用我」的地方。
 
 ---
 

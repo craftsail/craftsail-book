@@ -39,6 +39,8 @@ CraftSail 是面向独立开发者和小团队的 AI / 开发者趋势数据门�
 | [SEO 落地](seo/SEO落地.md) | 独立 URL、真实链接、`<head>`、robots、sitemap、llms.txt；为什么内容站用 Astro 不用 Next.js；Blog 做成带分页的 feed 流，Help 用带 href 的 sidebar |
 | [SEO 的监测](seo/SEO的监测.md) | 用 Search Console、GA4、Cloudflare 看抓取、收录、排名、点击、到站和 AI 流量；CTR 曲线、机会点击、收录时长等公式；每天 / 每周 / 每月的节奏和周报模板 |
 | [新站的 SEO 监测](seo/新站的SEO监测.md) | 收录 200–1000 页的新站怎么看 GSC 和 GA4：匿名查询、平均排名、小样本 CTR、GA4 阈值哪些不能信；按 sitemap 看索引率，用 URL Inspection API 每天查全站，算收录时长和展示覆盖率；新站版周报，以及什么时候算过了这一关 |
+| [GSC 与 Bing 的接入操作](seo/GSC与Bing的接入操作.md) | 后台怎么点：上线前用 curl 自查；GSC 选网域资源、DNS 验证、提交 sitemap、「无法获取」怎么排查、请求编入索引的配额、关联 GA4、用 API 提交 sitemap 和查收录；Bing 从 GSC 导入、提交 sitemap、IndexNow 三种接法、URL Submission 和 API；两边对照表、上线当天清单、上线后每天每周看什么 |
+| [Bing 的收录](seo/Bing的收录.md) | 为什么还要管 Bing：桌面份额、Yahoo / DuckDuckGo / Copilot 共用索引、ChatGPT 已基本不靠 Bing、中国流量；Bing 和 Google 收录的差别；上线当天接 Webmaster Tools、sitemap lastmod、IndexNow（带 curl 示例和返回码）、手动提交的真实额度；三种未收录状态和排查顺序；混乱期和托底；AI Performance 报告；新词站的节奏 |
 | [AI 推荐的监测](seo/AI推荐的监测.md) | 用户问 AI 时有没有你：抓得到、认得你、推荐你三个阶段；可见性、认知度、声量、引用怎么量，为什么要多次采样和给区间；robots 和各家 AI 爬虫、llms.txt；引用缺口和站外提及；节奏、过关信号和常见误判 |
 | [PMF 验证与第一批用户](growth/PMF验证与第一批用户.md) | 刚起步时怎么证明有人真的需要：七级证据链、Mom Test 访谈、手动拉来前 100 个海外 ToC 用户、留存走平、Sean Ellis 40% 调查（带置信区间）、早期定价、PMF 卷宗模板、没过时改哪一层、12 周计划，附参考文献 |
 | [工具产品出海运营](growth/工具产品出海运营.md) | 工具类产品从选题到付费的整条链路：选题打分、一句话定位、渠道怎么选、首发清单、激活、留存、定价和收款、分阶段目标、每周实验流程、合规 |
@@ -58,6 +60,7 @@ X、LinkedIn、Reddit、YouTube、Threads、Bluesky 上的账号怎么从 0 做�
 | [科技博主的选题雷达](account/科技博主的选题雷达.md) | 科技博主去哪找选题、怎么自动化、怎么提高阅读量：2026 年还能用的数据源（GitHub 7 月关了 star 名单、9 月新增 star 历史接口，OSS Insight 热门 3 月停了，Papers with Code 已关站）；「好玩 / 有价值 / 趋势」三类选题的信号；打分卡和刷星识别（StarScout 约 600 万疑似假 star）；可直接运行的 [topic_radar.py](account/tools/topic_radar.py) 和实测输出；GitHub Actions 每天自动跑；哪些步骤交给机器、哪些必须人做；Upworthy 3 万多组标题实验得出的写法 |
 | [科技博主的视频工具箱](account/科技博主的视频工具箱.md) | 做视频的方法论和工具：YouTube 按「每次展示的观看时长」排序，Test & Compare 也按观看时长份额判胜负；Guo 2014 年 690 万次观看研究的 6 分钟坎；Mayer 多媒体学习原则（附独立元分析的折扣）；录屏、剪辑、程序化视频（Remotion / HyperFrames / Manim）、字幕、配音怎么选；Claude Code 和 Codex 的视频 skill（Remotion、HyperFrames 官方 skill，video-use，openai/skills 已弃用改插件）和安装前的安全检查；把方法论写成自己的频道 skill；开源速览、教程、论文讲解三条流水线 |
 | [避免同质化：四个内容方法论](account/避免同质化的四个内容方法论.md) | 流水线做久了内容会长得一样：X 源码里的作者去重和负反馈、YouTube 2025 年「不真实内容」政策、广告磨损实验（读者在乎时只有实质变化有用）、生成式 AI 让内容彼此更像（Doshi & Hauser 2024）；四个各管一个维度的方法论——Hero / Hub / Help 管分量和节奏，新闻价值（Harcup & O'Neill 2017）管角度，STEPPS 和 Berger & Milkman 管传播动机，探索与利用（Thompson 抽样）管实验；可运行的 [content_mix.py](account/tools/content_mix.py) 算同质化程度、排下周计划；一个选题一周的四种发法和发前自检 |
+| [Reddit 账号](account/Reddit账号.md) | 小工具怎么从 Reddit 拿到用户和收入：和 X 的区别（通行证不是广播台），发帖、评论、长尾三条线；六个小产品的做法和数字（How to Convert 一帖带来首月 800+ 付费、Rybbit 星多付费少、Postiz 每个功能发一次版本、Simple Analytics 监控「alternative」、垂直版块的游戏、GummySearch 死于 API）；2026 年的变化（r/SaaS 60 天限额、官方 CQS 说明、7 月大模型反垃圾、Reddit Pro、RSS 和公开 API 关闭、FTC 评价规则）；养号、找帖、写回复、发帖和找长尾帖的做法；阶段时间分配、周表和模型参数；以 CraftSail 为例的计划 |
 
 ## 相关
 
