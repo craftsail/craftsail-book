@@ -45,6 +45,7 @@ CraftSail 是面向独立开发者和小团队的 AI / 开发者趋势数据门�
 | [PMF 验证与第一批用户](growth/PMF验证与第一批用户.md) | 刚起步时怎么证明有人真的需要：七级证据链、Mom Test 访谈、手动拉来前 100 个海外 ToC 用户、留存走平、Sean Ellis 40% 调查（带置信区间）、早期定价、PMF 卷宗模板、没过时改哪一层、12 周计划，附参考文献 |
 | [工具产品出海运营](growth/工具产品出海运营.md) | 工具类产品从选题到付费的整条链路：选题打分、一句话定位、渠道怎么选、首发清单、激活、留存、定价和收款、分阶段目标、每周实验流程、合规 |
 | [工具产品看数据](growth/工具产品看数据.md) | 北极星和指标树、埋点事件表、UTM 规范、渠道质量、激活漏斗、留存队列、MRR 拆分、LTV / CAC、数字掉了怎么查、样本量和置信区间、看板、周报模板、SQL |
+| [广告变现接入](growth/广告变现接入.md) | 工具站和内容站要不要挂广告、挂哪家：AdSense、Adsterra、Monetag、Media.net、Ezoic、Journey / Mediavine、Raptive、EthicalAds、Carbon 的门槛、广告形式、分成和结算（2026 年 Ezoic 涨到 25 万月活、Journey 降到 1,000 session、Raptive 降到 2.5 万 PV）；Adsterra 和 AdSense 的区别、能不能一起用，Chrome 按 Better Ads Standards 过滤全站广告；按阶段怎么选；AdSense、Adsterra、EthicalAds 的接入步骤和 Astro / Next.js 代码，ads.txt、欧洲 CMP；上线后看什么，以及广告收入和转化损失怎么算账 |
 | [目录站与 awesome 列表](growth/目录站与awesome列表.md) | 早期网站提交目录到底值不值：实测多数「免费 dofollow」其实是 nofollow，Google 把低质量目录和换徽章链接列为链接垃圾；真正的价值是少数目录的引荐、新域名被发现、比较页和 AI 推荐的入选资格；五类目录怎么挑、awesome 列表怎么上和自建、三批提交计划、跟踪表、模型参数 |
 | [怎么找社区](growth/怎么找社区.md) | 早期找用户聚集的社区：先列词表，再用六种方法找（搜索运算符、竞品引荐来源、SparkToro、平台内搜索、精选列表、关键词监控）；按发帖数、每帖评论、推广规则打分挑 3–5 个；用 HN 和 Stack Exchange 公开 API 量化话题热度；Reddit / HN / Stack Overflow / Discord 的硬规则；以 CraftSail 为例的实测数据 |
 | [冷外联](growth/冷外联.md) | 主动给陌生人发邮件和私信：2026 年回复率基准（平均约 3.4%）、跟进和个性化的效果；小产品该找「放大器」而不是终端用户；联系方式哪些能用（不能抓 GitHub 邮箱）、四段式写法和英文模板；Gmail / Yahoo / Microsoft 发件要求、LinkedIn 和 X 的限制；美国、欧盟、英国、德国、加拿大的法律差异；以 CraftSail 为例的计划 |
