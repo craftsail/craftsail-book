@@ -41,16 +41,21 @@ CraftSail 是面向独立开发者和小团队的 AI / 开发者趋势数据门�
 | [新站的 SEO 监测](seo/新站的SEO监测.md) | 收录 200–1000 页的新站怎么看 GSC 和 GA4：匿名查询、平均排名、小样本 CTR、GA4 阈值哪些不能信；按 sitemap 看索引率，用 URL Inspection API 每天查全站，算收录时长和展示覆盖率；新站版周报，以及什么时候算过了这一关 |
 | [GSC 与 Bing 的接入操作](seo/GSC与Bing的接入操作.md) | 后台怎么点：上线前用 curl 自查；GSC 选网域资源、DNS 验证、提交 sitemap、「无法获取」怎么排查、请求编入索引的配额、关联 GA4、用 API 提交 sitemap 和查收录；Bing 从 GSC 导入、提交 sitemap、IndexNow 三种接法、URL Submission 和 API；两边对照表、上线当天清单、上线后每天每周看什么 |
 | [Bing 的收录](seo/Bing的收录.md) | 为什么还要管 Bing：桌面份额、Yahoo / DuckDuckGo / Copilot 共用索引、ChatGPT 已基本不靠 Bing、中国流量；Bing 和 Google 收录的差别；上线当天接 Webmaster Tools、sitemap lastmod、IndexNow（带 curl 示例和返回码）、手动提交的真实额度；三种未收录状态和排查顺序；混乱期和托底；AI Performance 报告；新词站的节奏 |
+| [小语种搜索引擎的收录](seo/小语种搜索引擎的收录.md) | Google、Bing 之外还要不要接别的搜索引擎：按语言看各国份额（德法西葡、日语只需 Google + Bing，韩语、俄语、土耳其语、捷克语、越南语要另接）；法德的 Ecosia / Qwant 换成欧洲自建索引 Staan；Yandex、Naver、Daum、Seznam、Cốc Cốc 的账号、验证、sitemap、手动提交和后台报告；IndexNow 参与名单；robots.txt 和 WAF 别挡各家爬虫；加新语言时的清单 |
 | [AI 推荐的监测](seo/AI推荐的监测.md) | 用户问 AI 时有没有你：抓得到、认得你、推荐你三个阶段；可见性、认知度、声量、引用怎么量，为什么要多次采样和给区间；robots 和各家 AI 爬虫、llms.txt；引用缺口和站外提及；节奏、过关信号和常见误判 |
 | [PMF 验证与第一批用户](growth/PMF验证与第一批用户.md) | 刚起步时怎么证明有人真的需要：七级证据链、Mom Test 访谈、手动拉来前 100 个海外 ToC 用户、留存走平、Sean Ellis 40% 调查（带置信区间）、早期定价、PMF 卷宗模板、没过时改哪一层、12 周计划，附参考文献 |
 | [工具产品出海运营](growth/工具产品出海运营.md) | 工具类产品从选题到付费的整条链路：选题打分、一句话定位、渠道怎么选、首发清单、激活、留存、定价和收款、分阶段目标、每周实验流程、合规 |
 | [工具产品看数据](growth/工具产品看数据.md) | 北极星和指标树、埋点事件表、UTM 规范、渠道质量、激活漏斗、留存队列、MRR 拆分、LTV / CAC、数字掉了怎么查、样本量和置信区间、看板、周报模板、SQL |
 | [出海收款](growth/出海收款.md) | 一笔海外的钱从用户刷卡到进国内银行卡要经过收单、打款、结汇、报税四层；MoR 和 Stripe 的区别；按身份选路线：只有大陆身份、有香港身份、有海外公司各能用什么、钱打到哪、税交给谁（税务居民看住所不看证件，个税法第八条的受控外国企业规则）；Creem、Paddle、Dodo、Polar、Lemon Squeezy、Stripe Managed Payments 的费率、中国卖家能不能用、打款方式和现状，同一笔订阅各家实际扣多少；支付宝、万里汇、Payoneer、PayPal、Wise、香港卡怎么把钱拿回国，5 万美元额度管什么；Form 5472 的 $25,000 罚款；境外所得个税自查；Visa VAMP 1.5% 和拒付；App Store / Google Play 抽成；Creem / Paddle 接入步骤和 Webhook 代码，上线清单 |
+| [iOS 出海上架：从个人开发者账号到香港公司](growth/iOS出海上架与开发者账号.md) | 只做海外区的 iOS App：个人 / 组织 / 企业账号的区别（没有「美区开发者」这回事，独资经营不算组织）；大陆身份在 Apple Developer App 里注册（¥688）；商店资料、去掉中国大陆区免备案、欧盟 DSA 交易商声明会公开地址和电话；付费协议、W-8BEN（App 销售不预扣美国税）、银行卡 / 万里汇 / 香港账户怎么填、小型企业计划、财务月和到账时间；换成香港有限公司的路线：D-U-N-S、个人转组织原地迁移（Team ID 不变）、W-8BEN-E、每年的周年申报 / 商业登记 / 审计成本；App 转移的条件、Sign in with Apple 60 天迁移窗口、先用别人账号上架的风险；分阶段清单 |
+| [iOS 实操：个人付费注册开发者账号，提交第一个 App](growth/iOS个人账号付费与提交App.md) | 照着做的操作手册：大陆身份在 Apple Developer App 里刷身份证、用支付宝 / 微信 / 银行卡付 ¥688（按年自动续订，不能用余额），非大陆身份网页注册必须用本人信用卡，续费和过期的影响；签协议、Xcode 26 / Bundle ID、审核最常卡的几条（删除账号、第三方登录、内购、套壳）；建 App、年龄分级新问卷、去掉中国大陆区、截图尺寸（6.1 英寸 1179 × 2556）、关键词和隐私问卷；Archive 上传、TestFlight、提交审核和被拒后怎么处理；清单 |
 | [广告变现接入](growth/广告变现接入.md) | 工具站和内容站要不要挂广告、挂哪家：AdSense、Adsterra、Monetag、Media.net、Ezoic、Journey / Mediavine、Raptive、EthicalAds、Carbon 的门槛、广告形式、分成和结算（2026 年 Ezoic 涨到 25 万月活、Journey 降到 1,000 session、Raptive 降到 2.5 万 PV）；Adsterra 和 AdSense 的区别、能不能一起用，Chrome 按 Better Ads Standards 过滤全站广告；按阶段怎么选；收入怎么算：后台 Impressions / CTR / CPM / Revenue 的含义和公式，为什么有展示收入却是 $0，按国家加权估算月收入，按国家汇总导出数据的 Python 脚本，Adsterra 的起付线、结算周期和记账；AdSense、Adsterra、EthicalAds 的接入步骤和 Astro / Next.js 代码，ads.txt、欧洲 CMP；上线后看什么，以及广告收入和转化损失怎么算账 |
 | [目录站与 awesome 列表](growth/目录站与awesome列表.md) | 早期网站提交目录到底值不值：实测多数「免费 dofollow」其实是 nofollow，Google 把低质量目录和换徽章链接列为链接垃圾；真正的价值是少数目录的引荐、新域名被发现、比较页和 AI 推荐的入选资格；五类目录怎么挑、awesome 列表怎么上和自建、三批提交计划、跟踪表、模型参数 |
 | [怎么找社区](growth/怎么找社区.md) | 早期找用户聚集的社区：先列词表，再用六种方法找（搜索运算符、竞品引荐来源、SparkToro、平台内搜索、精选列表、关键词监控）；按发帖数、每帖评论、推广规则打分挑 3–5 个；用 HN 和 Stack Exchange 公开 API 量化话题热度；Reddit / HN / Stack Overflow / Discord 的硬规则；以 CraftSail 为例的实测数据 |
 | [冷外联](growth/冷外联.md) | 主动给陌生人发邮件和私信：2026 年回复率基准（平均约 3.4%）、跟进和个性化的效果；小产品该找「放大器」而不是终端用户；联系方式哪些能用（不能抓 GitHub 邮箱）、四段式写法和英文模板；Gmail / Yahoo / Microsoft 发件要求、LinkedIn 和 X 的限制；美国、欧盟、英国、德国、加拿大的法律差异；以 CraftSail 为例的计划 |
+| [外链建设](seo/外链建设.md) | 目录站以外的外链怎么做：Google 怎么说外链的重要性（Illyes：不是前三，需要很少的链接）和 Ahrefs 的数据（96.55% 的页面没有搜索流量）；垃圾内容政策、sponsored / ugc / nofollow、GitHub 和维基百科等平台的链接类型、网站声誉滥用、disavow 什么时候用；判断外链质量的七个维度；免费小工具、统计页、未加链接的提及、列表文章外联、集成页、记者请求平台（HARO 已关，Qwoted / Featured / Source of Sources）、客座文章、断链建设的具体做法和英文模板；要避开的做法和外链行情；分阶段节奏；检查外链和 rel 的 Python 脚本、跟踪表、常见误判 |
 | [SEO 术语表](seo/SEO术语表.md) | SEO、GSC、GA4、CTR、LCP、GEO、SSR 等缩写的英文全称和中文解释，按搜索结果页、抓取收录、页面标签、结构化数据、性能、监测、AI 搜索、前端架构分组 |
+| [Google 与 GitHub 的 OAuth 登录](site/Google与GitHub的OAuth登录.md) | 工具站的「Continue with Google / GitHub」怎么接：授权码 + PKCE + state 的完整流程图；两家的授权、换 token、用户信息、撤销地址对照表；Google Auth Platform 里品牌、目标对象（Testing 和发布）、scope、Web 客户端和回调地址怎么填，secret 只显示一次；GitHub 选 OAuth App 还是 GitHub App、回调只能填一个所以 dev / 线上分两个 App、`Accept: application/json` 和出错也返回 200、私密邮箱查 `/user/emails`；不依赖库的 TypeScript 代码和表结构、账号合并的安全边界；Better Auth / Auth.js / Arctic；常见报错和上线清单 |
 
 ### 出海账号
 
@@ -75,14 +80,18 @@ X、LinkedIn、Reddit、YouTube、Threads、Bluesky 上的账号怎么从 0 做�
 | [Google Search Console](https://search.google.com/search-console) | 看 Google 的收录、展示、点击、排名，提交 sitemap | [GSC 与 Bing 的接入操作](seo/GSC与Bing的接入操作.md) |
 | [Bing Webmaster Tools](https://www.bing.com/webmasters) | Bing 的收录和搜索数据，可以从 GSC 一键导入 | [Bing 的收录](seo/Bing的收录.md) |
 | [IndexNow](https://www.indexnow.org) | 页面更新后主动通知 Bing 等搜索引擎 | [Bing 的收录](seo/Bing的收录.md) |
+| [Yandex Webmaster](https://webmaster.yandex.com) | Yandex 的收录和搜索数据，做俄语、土耳其语市场要接 | [小语种搜索引擎的收录](seo/小语种搜索引擎的收录.md) |
+| [Naver Search Advisor](https://searchadvisor.naver.com) | Naver 的站长后台，做韩语市场要接，提交 sitemap 和 RSS | [小语种搜索引擎的收录](seo/小语种搜索引擎的收录.md) |
+| [Seznam Webmaster](https://reporter.seznam.cz/wm) / [Cốc Cốc Search Console](https://coccoc.com/search/console/get-your-website-on-coc-coc-search) | 捷克语、越南语市场的站长后台 | [小语种搜索引擎的收录](seo/小语种搜索引擎的收录.md) |
 | [PageSpeed Insights](https://pagespeed.web.dev) | 测 LCP、CLS、INP 等性能指标 | [SEO 的监测](seo/SEO的监测.md) |
 | [富媒体搜索结果测试](https://search.google.com/test/rich-results) | 检查结构化数据能不能被 Google 识别 | [SEO 落地](seo/SEO落地.md) |
 | [Schema Markup Validator](https://validator.schema.org) | 校验 schema.org 结构化数据 | [SEO 落地](seo/SEO落地.md) |
 | [Google Trends](https://trends.google.com) | 看关键词的热度和趋势 | [科技博主的选题雷达](account/科技博主的选题雷达.md) |
-| [Ahrefs Webmaster Tools](https://ahrefs.com/webmaster-tools) | 免费查自己站点的外链和 SEO 问题 | [目录站与 awesome 列表](growth/目录站与awesome列表.md) |
+| [Ahrefs Webmaster Tools](https://ahrefs.com/webmaster-tools) | 免费查自己站点的外链和 SEO 问题 | [外链建设](seo/外链建设.md)、[目录站与 awesome 列表](growth/目录站与awesome列表.md) |
 | [Semrush](https://www.semrush.com) | 关键词和竞品分析 | [工具产品出海运营](growth/工具产品出海运营.md) |
 | [Similarweb](https://www.similarweb.com) | 估算竞品的流量和来源 | [怎么找社区](growth/怎么找社区.md) |
 | [llms.txt](https://llmstxt.org) | 给 AI 读的站点说明文件规范 | [AI 推荐的监测](seo/AI推荐的监测.md) |
+| [Qwoted](https://www.qwoted.com) / [Featured](https://featured.com) / [Source of Sources](https://sourceofsources.com) / [MentionMatch](https://mentionmatch.com) | 记者请求平台：回答记者的问题，被媒体引用并拿到外链 | [外链建设](seo/外链建设.md) |
 | [SEO Gets](https://seogets.com) / [GSC Wizard](https://www.gscwizard.com) / [SEOTesting](https://seotesting.com) | 基于 GSC 数据的分析小工具 | [新站的 SEO 监测](seo/新站的SEO监测.md)、[SEO 的监测](seo/SEO的监测.md) |
 
 ### 数据分析
@@ -103,6 +112,9 @@ X、LinkedIn、Reddit、YouTube、Threads、Bluesky 上的账号怎么从 0 做�
 | [Astro](https://astro.build) | 内容站框架，SEO 友好 | [SEO 落地](seo/SEO落地.md) |
 | [Starlight](https://starlight.astro.build) / [Docusaurus](https://docusaurus.io) / [Mintlify](https://mintlify.com) | 文档站 | [SEO 落地](seo/SEO落地.md) |
 | [Next.js](https://nextjs.org) / [Vercel](https://vercel.com) | 应用框架和部署 | [SEO 落地](seo/SEO落地.md) |
+| [Google Auth Platform](https://console.cloud.google.com/auth/clients) | 建 Google 登录的 OAuth 客户端、填回调地址、发布应用 | [Google 与 GitHub 的 OAuth 登录](site/Google与GitHub的OAuth登录.md) |
+| [GitHub OAuth Apps](https://github.com/settings/developers) | 建 GitHub 登录的 OAuth App | [Google 与 GitHub 的 OAuth 登录](site/Google与GitHub的OAuth登录.md) |
+| [Better Auth](https://www.better-auth.com) / [Auth.js](https://authjs.dev) / [Arctic](https://arcticjs.dev) | 登录和 OAuth 的现成库 | [Google 与 GitHub 的 OAuth 登录](site/Google与GitHub的OAuth登录.md) |
 
 ### 发布和目录站
 
@@ -180,6 +192,7 @@ X、LinkedIn、Reddit、YouTube、Threads、Bluesky 上的账号怎么从 0 做�
 | [Lemon Squeezy](https://www.lemonsqueezy.com) | MoR，已被 Stripe 收购，新项目不推荐 | [出海收款](growth/出海收款.md) |
 | [Stripe](https://stripe.com) / [Stripe Managed Payments](https://stripe.com/managed-payments) / [Stripe Atlas](https://stripe.com/atlas) | 支付处理；Stripe 自己的 MoR；注册美国公司 | [出海收款](growth/出海收款.md) |
 | [RevenueCat](https://www.revenuecat.com) | App 内购订阅管理 | [PMF 验证与第一批用户](growth/PMF验证与第一批用户.md) |
+| [App Store Connect](https://appstoreconnect.apple.com) / [Apple Developer](https://developer.apple.com) | 上架 iOS App、签付费协议、填税表和银行、看付款报告；开发者账号注册和个人转组织 | [iOS 出海上架](growth/iOS出海上架与开发者账号.md)、[iOS 实操](growth/iOS个人账号付费与提交App.md) |
 | [Rewardful](https://www.rewardful.com) | 联盟分销计划 | [工具产品出海运营](growth/工具产品出海运营.md) |
 | [万里汇 WorldFirst](https://www.worldfirst.com.cn) / [Payoneer](https://www.payoneer.com) | 收美元、结汇回国内 | [出海收款](growth/出海收款.md) |
 | [PayPal](https://www.paypal.com) / [Wise](https://wise.com) / [Mercury](https://mercury.com) | 收款账户；Mercury 是美国公司的线上银行 | [出海收款](growth/出海收款.md) |
